@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Date;
  */
 public class FicheActivity extends Activity implements View.OnClickListener {
     static final int REQUEST_IMAGE_PICTURE = 1;
-    DBHelper dbh;
+    ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
     static int position;
 
     TextView title;
@@ -49,7 +50,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
     EditText user_c;
     RatingBar ratingBar;
 
-    String numOeuvre;
+    int numOeuvre;
 
     String etat_o;
     String id;
@@ -60,7 +61,6 @@ public class FicheActivity extends Activity implements View.OnClickListener {
 
 
     public FicheActivity() {
-        this.dbh = FirstActivity.getDBH();
     }
 
     @Override
@@ -68,7 +68,8 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fiche);
-
+        Bundle bundle = getIntent().getExtras();
+        oeuvreList = bundle.getParcelableArrayList("List");
         title = (TextView) findViewById(R.id.titre);
         author = (TextView) findViewById(R.id.artiste);
         date = (TextView) findViewById(R.id.date);
@@ -82,30 +83,25 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
         Intent intent = getIntent();
-        numOeuvre = intent.getStringExtra("numOeuvre");
+        numOeuvre = intent.getIntExtra("numOeuvre",0);
 
-        Cursor c = dbh.retourneOeuvre(numOeuvre);
-        c.moveToFirst();
-
-        //récupère les données dans c;
-        String titre_o = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
-        String tech_nbr = c.getString(c.getColumnIndex(DBHelper.O_TECHNIQUE));
-        String cat_nbr = c.getString(c.getColumnIndex(DBHelper.O_CATEGORIE));
-        String quart_nbr = c.getString(c.getColumnIndex(DBHelper.O_QUARTIER));
-        String mat_nbr = c.getString(c.getColumnIndex(DBHelper.O_MATERIAU));
-        String dimension_o = c.getString(c.getColumnIndex(DBHelper.O_DIMENSION));
-        String uri_photo = c.getString(c.getColumnIndex(DBHelper.O_URI_IMAGE));
-        String date_oeuvre = c.getString(c.getColumnIndex(DBHelper.O_DATE_PROD));
-        user_comment = c.getString(c.getColumnIndex(DBHelper.O_COMMENT));
-        user_rating = c.getInt(c.getColumnIndex(DBHelper.O_RATING));
-        etat_o = c.getString(c.getColumnIndex(DBHelper.O_ETAT));
-        c.close();
+        String titre_o = oeuvreList.get(numOeuvre).getTitre();
+        String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String quart_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String mat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String dimension_o = oeuvreList.get(numOeuvre).getDimension();
+        String uri_photo = oeuvreList.get(numOeuvre).getURI();
+        String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
+        user_comment = oeuvreList.get(numOeuvre).getTitre();
+        user_rating = oeuvreList.get(numOeuvre).getEtat();
+        etat_o = oeuvreList.get(numOeuvre).getTitre();
         //set title
         title.setText(titre_o);
 
 
         //set artist(s) name(s)
-        String o_artistes = dbh.retourneNomsArtistes(numOeuvre);
+        String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
         author.setText(o_artistes);
 
         //date de la photo
@@ -115,10 +111,10 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         String dimension = dimension_o;
 
         //technique
-        String tech_oeuvre = dbh.retourneNom(DBHelper.TABLE_TECHNIQUES, DBHelper.T_ID, tech_nbr, DBHelper.T_NOM);
-        String cat_oeuvre = dbh.retourneNom(DBHelper.TABLE_CATEGORIES, DBHelper.C_ID, cat_nbr, DBHelper.C_NOM);
-        String quart_oeuvre = dbh.retourneNom(DBHelper.TABLE_QUARTIERS, DBHelper.Q_ID, quart_nbr, DBHelper.Q_NOM);
-        String mat_oeuvre = dbh.retourneNom(DBHelper.TABLE_MATERIAUX, DBHelper.M_ID, mat_nbr, DBHelper.M_NOM);
+        String tech_oeuvre = oeuvreList.get(numOeuvre).getTechnique();
+        String cat_oeuvre = oeuvreList.get(numOeuvre).getTitre();
+        String quart_oeuvre = oeuvreList.get(numOeuvre).getQuartier();
+        String mat_oeuvre = oeuvreList.get(numOeuvre).getMateriaux();
 
 
         String information = "Quartier: " + quart_oeuvre + "\n" + "Dimensions: " + dimension + "\n"
@@ -127,17 +123,17 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         infos.setText(information);
 
         //image de l'oeuvre ou par défaut
-        if (uri_photo.equals(dbh.URI_DEF)) {
-            Picasso.with(this).load(uri_photo).resize(500, 888).into(photo);
+        //if (uri_photo.equals(dbh.URI_DEF)) {
+            Picasso.with(this).load("http://www-ens.iro.umontreal.ca/~krausele/emptyImage.png").resize(500, 888).into(photo);
             photo.setVisibility(View.VISIBLE);
-        } else {
+       /* } else {
             Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
             photo.setImageBitmap(bmImg);
         }
-
+*/
 
         //si l'oeuvre est dans les favoris, le bouton n'est "pas actif" donc blanc
-        if (etat_o.equals(dbh.ETAT_FAVORIS)) {
+        /*if (etat_o.equals(dbh.ETAT_FAVORIS)) {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
             date_ajout.setVisibility(date_ajout.GONE);
         }
@@ -164,12 +160,12 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             }
 
 
-        } else {
+        } else {*/
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
             date_ajout.setVisibility(date_ajout.GONE);
             user_c.setVisibility(user_c.GONE);
             ratingBar.setVisibility(ratingBar.GONE);
-        }
+        //}
 
         changes = getApplicationContext().getSharedPreferences("change_rating", Context.MODE_PRIVATE);
 
@@ -237,8 +233,8 @@ public class FicheActivity extends Activity implements View.OnClickListener {
                 imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
 
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                dbh.ajoutePhoto(numOeuvre, currentPath, timeStamp);
-                dbh.changeEtat(numOeuvre, dbh.ETAT_GALERIE);
+                //dbh.ajoutePhoto(numOeuvre, currentPath, timeStamp);
+                //dbh.changeEtat(numOeuvre, dbh.ETAT_GALERIE);
 
                 GalleryFragment.sca.notifyDataSetChanged();
 
@@ -259,7 +255,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         Intent intent;
         switch (v.getId()) {
             case R.id.button_fav:
-
+/*
                 if (etat_o.equals(dbh.ETAT_NORMAL)) {
 
                     //méthode qui change l'état dans la base de données
@@ -273,9 +269,9 @@ public class FicheActivity extends Activity implements View.OnClickListener {
 
                     Toast.makeText(this, "Oeuvre retirée des favoris", Toast.LENGTH_SHORT).show();
                     WishListFragment.sca.notifyDataSetChanged();
-                } else {
+                } else {*/
                     Log.d("listViewCursorAdaptor", "on ne peut pas changer l'état: " + etat_o);
-                }
+               // }
 
                 Intent refresh = new Intent(this, FicheActivity.class);
                 refresh.putExtra("numOeuvre", numOeuvre);
@@ -322,7 +318,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             String comment = String.valueOf(user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            //dbh.ajouteComment(numOeuvre, comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -332,7 +328,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         if(changesRating){
             int rating = (int) ratingBar.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
+            //dbh.ajouteRating(numOeuvre, rating);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
@@ -354,7 +350,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             String comment = String.valueOf(user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            //dbh.ajouteComment(numOeuvre, comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -364,7 +360,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         if(changesRating){
             int rating = (int) ratingBar.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
+            //dbh.ajouteRating(numOeuvre, rating);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
@@ -386,7 +382,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             String comment = String.valueOf(user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            //dbh.ajouteComment(numOeuvre, comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -396,7 +392,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         if(changesRating){
             int rating = (int) ratingBar.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
+            //dbh.ajouteRating(numOeuvre, rating);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);

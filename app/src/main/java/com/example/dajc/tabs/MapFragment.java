@@ -45,7 +45,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     ResourceProxy mResourceProxy;
     IMapController mapController;
 
-
+    ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
     //attention, ces coordonnées existent donc si c'est le cas il y aura un bug
     public double lati = 0;
     public double longi = 0;
@@ -61,14 +61,15 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     DBHelper dbh;
 
     public MapFragment (){
-        this.dbh = FirstActivity.getDBH();
+        //this.dbh = FirstActivity.getDBH();
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        v = inflater.inflate(R.layout.map_frag_layout, container, false);
+        Bundle bundle = this.getArguments();
+        oeuvreList = bundle.getParcelableArrayList("List");        v = inflater.inflate(R.layout.map_frag_layout, container, false);
         listViewButton = (ImageButton) v.findViewById(R.id.button_listView);
         listViewButton.setOnClickListener(this);
 
@@ -128,10 +129,20 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         OverlayItem myOverlayItem;
 
         //dbh = new DBHelper(Activity.this);
+        for (int i=0;i<oeuvreList.size();i++)
+        {
+            title = oeuvreList.get(i).getTitre();
+            id = oeuvreList.get(i).getId();
 
-        Cursor c = dbh.listeTable(DBHelper.TABLE_OEUVRES, DBHelper.O_TITRE);
-        c.moveToFirst();
+            art_lati = oeuvreList.get(i).getLocationX();
+            art_longi = oeuvreList.get(i).getLocationY();
 
+            myOverlayItem = new OverlayItem(title, id, new GeoPoint(art_lati, art_longi));
+            items.add(myOverlayItem);
+
+            item_nb++;
+        }
+/*
         while (!c.isAfterLast()) {
             title = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
             id = c.getString(c.getColumnIndex(DBHelper.O_ID));
@@ -146,7 +157,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             c.moveToNext();
 
         }
-
+*/
         Log.d("map", "Items added = " + item_nb);
 
         ItemizedIconOverlay.OnItemGestureListener<OverlayItem> iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -272,6 +283,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 }
                 intent.putExtra("Geo_longi", longi_s);
                 intent.putExtra("Geo_lati", lati_s);
+                intent.putExtra("List",oeuvreList);
                 startActivity(intent);
                 break;
             case R.id.button_location:

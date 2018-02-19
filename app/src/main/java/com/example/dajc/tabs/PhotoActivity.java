@@ -41,7 +41,7 @@ public class PhotoActivity extends Activity{
     SharedPreferences changes;
 
     public PhotoActivity() {
-        this.dbh = FirstActivity.getDBH();
+       // this.dbh = FirstActivity.getDBH();
     }
 
     @Override

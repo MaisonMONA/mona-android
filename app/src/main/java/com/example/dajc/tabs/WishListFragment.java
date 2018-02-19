@@ -24,7 +24,7 @@ public class WishListFragment extends Fragment implements AdapterView.OnItemClic
 
     public WishListFragment(){
         //this.root = root;
-        this.dbh = FirstActivity.getDBH();
+        //this.dbh = FirstActivity.getDBH();
     }
 
     @Nullable

@@ -1,8 +1,13 @@
 package com.example.dajc.tabs;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,11 +16,29 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,18 +48,24 @@ public class MainActivity extends AppCompatActivity {
     //CustomViewPager pager;
 
     public final int nb = 4;
+    private String TAG = MainActivity.class.getSimpleName();
+    private ListView lv;
+    ArrayList<OeuvreObject> oeuvreList; //liste d'oeuvre qui sera passée à chaque activité
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Bundle bundle = getIntent().getExtras();
+        oeuvreList = bundle.getParcelableArrayList("List");
+
 
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         pager = (ViewPager) findViewById(R.id.pager);
         //custom pager without swiping
-            //pager = (CustomViewPager)findViewById(R.id.pager);
-            //pager.setPagingEnabled(false);
+        //pager = (CustomViewPager)findViewById(R.id.pager);
+        //pager.setPagingEnabled(false);
 
 
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -45,16 +74,6 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(pager);
 
         pagerAdapter.setTabIcon();
-
-        /*
-        moved to first activity
-        RunAPI run = new RunAPI(this, this);
-        run.execute();
-        //WishListFragment.sca.notifyDataSetChanged();
-        //GalleryFragment.sca.notifyDataSetChanged();
-
-        */
-
     }
 
     @Override
@@ -70,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.settings) {
             Intent intent = new Intent(this, PreferencesActivity.class);
+            intent.putExtra("List", oeuvreList);
             startActivity(intent);
         }
 
@@ -133,15 +153,21 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment;
             if (position == 0) {
                 fragment = new FicheFragment();
-            } else if (position == 1) {
+            } else if (position == 1){
                 fragment = new MapFragment();
-            } else if (position == 2) {
+            } /*else  {
                 fragment = new WishListFragment();
-            } else {
+            }
+            /*else {
                 fragment = new GalleryFragment();
+            }
+            */
+            else {
+                fragment = new FicheFragment();
             }
             Bundle args = new Bundle();
             args.putInt("id", position);
+            args.putParcelableArrayList("List",oeuvreList);
             fragment.setArguments(args);
             return fragment;
         }

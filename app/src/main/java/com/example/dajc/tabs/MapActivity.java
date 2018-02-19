@@ -51,7 +51,7 @@ public class MapActivity extends Activity implements LocationListener {
 
 
     public MapActivity(){
-       this.dbh = FirstActivity.getDBH();
+      // this.dbh = FirstActivity.getDBH();
     }
 
     @Override

@@ -26,13 +26,14 @@ public class RunAPI  extends AsyncTask<String, Object, Oeuvre[]> {
 
     @Override
     protected Oeuvre[] doInBackground(String... params) {
+        /*
         WebAPI web = new WebAPI(FirstActivity.getDBH());
         try {
-            root = web.run();
+            //root = web.run();
         } catch (IOException e) {
             //erreur
         };
-
+*/
         return root;
     }
 

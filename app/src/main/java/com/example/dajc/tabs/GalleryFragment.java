@@ -23,7 +23,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     public static SimpleCursorAdapter sca;
 
     public GalleryFragment(){
-        this.dbh =  FirstActivity.getDBH();
+       // this.dbh =  FirstActivity.getDBH();
 
     }
 

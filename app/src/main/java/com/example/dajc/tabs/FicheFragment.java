@@ -29,18 +29,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+
+import static java.lang.Integer.parseInt;
 
 /**
  * Created by DAJC on 2016-04-17.
  */
-public class FicheFragment extends Fragment implements View.OnClickListener {
+public class
+FicheFragment extends Fragment implements View.OnClickListener {
 
     static final int REQUEST_IMAGE_PICTURE = 1;
-    String numOeuvre;
-    String etat_o;
-    DBHelper dbh;
-
+    int numOeuvre;
+    int etat_o;
+    ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
     TextView title;
     TextView author;
     TextView date;
@@ -81,7 +84,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
 
     public FicheFragment (){
-        this.dbh = FirstActivity.getDBH();
+
         today = new SimpleDateFormat("yyyyMMdd").format(new Date());
         Log.d("settings", " today = "+today);
     }
@@ -90,7 +93,10 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fiche, container, false);
-
+        Bundle bundle = this.getArguments();
+        oeuvreList = bundle.getParcelableArrayList("List");
+        System.out.println(oeuvreList.get(2).getTitre());
+        numOeuvre = bundle.getInt("numOeuvre",0);
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
         date = (TextView) v.findViewById(R.id.date);
@@ -147,16 +153,14 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-
         //randomizes between works that are neither favorites nor in gallery, 1/day
         SharedPreferences settings = getActivity().getSharedPreferences("firstRun", Context.MODE_PRIVATE);
         if (settings.getBoolean("isFirstRun", true)) {
             //on first use, get a first prey of the day
 
-            c = dbh.listeTableOrd(dbh.TABLE_OEUVRES, dbh.O_ETAT, dbh.ETAT_NORMAL, "random()");
-            c.moveToFirst();
-            idDuJour = c.getString(c.getColumnIndex(DBHelper.O_ID));
-            c.close();
+
+            idDuJour = "2";
+
 
             //create a first lastUpdate
             lastUpdate = new SimpleDateFormat("yyyyMMdd").format(new Date());
@@ -180,7 +184,13 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
         }
         else if (lastU.equals(today)){
             //we have a prey of the day, let's load it
-            String todayId = settings.getString("idDuJour", "notSet");
+            String todayId;
+            try {
+                todayId = settings.getString("idDuJour", "notSet");
+            }
+            catch (ClassCastException e) {
+                todayId = "2";
+            }
             if (todayId.equals("notSet")){
                 Log.d("settings", "Houston we have another problem");
             } else {
@@ -188,13 +198,17 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
             }
         } else {
             //we need a new prey, let's get it
-            String newId;
-            do{
+            String newId ="2";
+           // do{
+                /*
                 c = dbh.listeTableOrd(dbh.TABLE_OEUVRES, dbh.O_ETAT, dbh.ETAT_NORMAL, "random()");
                 c.moveToFirst();
                 newId = c.getString(c.getColumnIndex(DBHelper.O_ID));
                 c.close();
-            } while (newId == settings.getString("idDuJour", "notSet"));
+                */
+           // }
+            /*
+            while (newId == settings.getString("idDuJour", "notSet"));
             //just to be sure it's not the same as yesterday
 
 
@@ -204,7 +218,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
             editor.putString("lastUpdate", newLastU);
             editor.putString("idDuJour", newId);
             editor.commit();
-
+*/
             //load it
             loadFiche(newId);
 
@@ -212,9 +226,40 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
 
         //set content
+        Intent intent = getActivity().getIntent();
+        numOeuvre = intent.getIntExtra("numOeuvre",0);
+
+        String titre_o = oeuvreList.get(numOeuvre).getTitre();
+        String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String quart_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String mat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String dimension_o = oeuvreList.get(numOeuvre).getDimension();
+        String uri_photo = oeuvreList.get(numOeuvre).getURI();
+        String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
+        user_comment = oeuvreList.get(numOeuvre).getCommentaire();
+        user_rating = oeuvreList.get(numOeuvre).getNote();
+        etat_o = oeuvreList.get(numOeuvre).getEtat();
+        //set title
         title.setText(titre_o);
+
+
+        //set artist(s) name(s)
+        String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
         author.setText(o_artistes);
+
+        //date de la photo
         date.setText(date_oeuvre);
+
+        //dimensions de l'oeuvre
+        String dimension = dimension_o;
+
+        //technique
+        String tech_oeuvre = oeuvreList.get(numOeuvre).getTechnique();
+        String cat_oeuvre = oeuvreList.get(numOeuvre).getTitre();
+        String quart_oeuvre = oeuvreList.get(numOeuvre).getQuartier();
+        String mat_oeuvre = oeuvreList.get(numOeuvre).getMateriaux();
+
 
         String information = "Quartier: " + quart_oeuvre + "\n" + "Dimensions: " + dimension + "\n"
                 + "Catégorie: " + cat_oeuvre + "\n" + "Technique: " + tech_oeuvre + "\n"
@@ -222,31 +267,33 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
         infos.setText(information);
 
         //image de l'oeuvre ou par défaut
-        if (uri_photo.equals(dbh.URI_DEF)) {
-            Picasso.with(getContext()).load(uri_photo).resize(500, 888).into(photo);
-            photo.setVisibility(View.VISIBLE);
+        if (uri_photo.equals("")) {
+            //Picasso.with(getContext()).load(uri_photo).resize(500, 888).into(photo);
+            //photo.setVisibility(View.VISIBLE);
         } else {
             Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
             photo.setImageBitmap(bmImg);
         }
 
 
+
         //si l'oeuvre est dans les favoris, le bouton n'est "pas actif" donc blanc
-        if (etat_o.equals(dbh.ETAT_FAVORIS)) {
+        //etat_o egal 1 sur favori, 2 si dans la gallerie
+        if (etat_o==1) {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
-            date_ajout.setVisibility(date_ajout.GONE);
+            date_ajout.setVisibility(View.GONE);
         }
         //si l'oeuvre est dans la galerie, on ne peut pas prendre de photo ou l'ajouter aux favoris
         //par contre, on affiche la date à laquelle la photo a été prise
-        else if (etat_o.equals(dbh.ETAT_GALERIE)) {
+        else if (etat_o==2) {
 
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
-            fav_b.setVisibility(fav_b.GONE);
-            cam_b.setVisibility(cam_b.GONE);
+            fav_b.setVisibility(View.GONE);
+            cam_b.setVisibility(View.GONE);
 
 
             //date de la photo de l'utilisateur
-            String date_photo = dbh.retourneDatephoto(numOeuvre);
+            String date_photo = oeuvreList.get(numOeuvre).getDatedePhoto();
             date_ajout.setText("photo du " + date_photo);
 
             //clickListener pour agrandir la photo
@@ -255,46 +302,35 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
             if (! user_comment.equals("")){
                 userC.setText(user_comment);
             }
-            if (user_rating != 0) {
+            if (user_rating != -1) {
                 ratingBar.setRating((float) user_rating);
             }
 
         } else {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
-            date_ajout.setVisibility(date_ajout.GONE);
-            userC.setVisibility(userC.GONE);
-            ratingBar.setVisibility(ratingBar.GONE);
-        }
+            date_ajout.setVisibility(View.GONE);
+            userC.setVisibility(View.GONE);
+            ratingBar.setVisibility(View.GONE);
+       }
     }
 
     public void loadFiche(String id) {
         //get content for the Fiche
+        int numOeuvre= parseInt(id);
+        String titre_o = oeuvreList.get(numOeuvre).getTitre();
+        String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String quart_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String mat_nbr = oeuvreList.get(numOeuvre).getTitre();
+        String dimension_o = oeuvreList.get(numOeuvre).getDimension();
+        String uri_photo = oeuvreList.get(numOeuvre).getURI();
+        String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
+        user_comment = oeuvreList.get(numOeuvre).getCommentaire();
+        user_rating = oeuvreList.get(numOeuvre).getNote();
+        etat_o = oeuvreList.get(numOeuvre).getEtat();
 
-        Cursor c = dbh.retourneOeuvre(id);
-        c.moveToFirst();
-        //récupère les données dans c;
-        titre_o = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
-        numOeuvre = c.getString(c.getColumnIndex(DBHelper.O_ID));
-        tech_nbr = c.getString(c.getColumnIndex(DBHelper.O_TECHNIQUE));
-        cat_nbr = c.getString(c.getColumnIndex(DBHelper.O_CATEGORIE));
-        quart_nbr = c.getString(c.getColumnIndex(DBHelper.O_QUARTIER));
-        mat_nbr = c.getString(c.getColumnIndex(DBHelper.O_MATERIAU));
-        dimension_o = c.getString(c.getColumnIndex(DBHelper.O_DIMENSION));
-        uri_photo = c.getString(c.getColumnIndex(DBHelper.O_URI_IMAGE));
-        date_oeuvre = c.getString(c.getColumnIndex(DBHelper.O_DATE_PROD));
-        etat_o = c.getString(c.getColumnIndex(DBHelper.O_ETAT));
-        user_comment = c.getString (c.getColumnIndex(DBHelper.O_COMMENT));
-        user_rating = c.getInt(c.getColumnIndex(DBHelper.O_RATING));
 
-        o_artistes = dbh.retourneNomsArtistes(numOeuvre);
-        dimension = dimension_o;
 
-        tech_oeuvre = dbh.retourneNom(DBHelper.TABLE_TECHNIQUES, DBHelper.T_ID, tech_nbr, DBHelper.T_NOM);
-        cat_oeuvre = dbh.retourneNom(DBHelper.TABLE_CATEGORIES, DBHelper.C_ID, cat_nbr, DBHelper.C_NOM);
-        quart_oeuvre = dbh.retourneNom(DBHelper.TABLE_QUARTIERS, DBHelper.Q_ID, quart_nbr, DBHelper.Q_NOM);
-        mat_oeuvre = dbh.retourneNom(DBHelper.TABLE_MATERIAUX, DBHelper.M_ID, mat_nbr, DBHelper.M_NOM);
-
-        c.close();
 
     }
     @Override
@@ -327,10 +363,13 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
                 //Log.d("photo", "dateTime stamp is "+timeStamp);
-
+/*
                 dbh.ajoutePhoto(numOeuvre, currentPath, timeStamp);
                 dbh.changeEtat(numOeuvre, dbh.ETAT_GALERIE);
-
+*/
+                oeuvreList.get(numOeuvre).setDatedePhoto(timeStamp);
+                oeuvreList.get(numOeuvre).setURI(currentPath);
+                oeuvreList.get(numOeuvre).setEtat(2);
                 Intent refresh = new Intent(getContext(), MainActivity.class);
                 startActivity(refresh);//Start the same Activity
                 getActivity().finish();
@@ -348,16 +387,16 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.button_fav:
 
-                if (etat_o.equals(dbh.ETAT_NORMAL)){
+                if (etat_o==0){
 
                     //méthode qui change l'état dans la base de données
-                    dbh.changeEtat(numOeuvre, dbh.ETAT_FAVORIS);
+                    oeuvreList.get(numOeuvre).setEtat(1);
 
                     Toast.makeText(getActivity(), "Oeuvre ajoutée aux favoris", Toast.LENGTH_SHORT).show();
                 }
-                else if (etat_o.equals(dbh.ETAT_FAVORIS)){
+                else if (etat_o==1){
 
-                    dbh.changeEtat(numOeuvre, dbh.ETAT_NORMAL);
+                   oeuvreList.get(numOeuvre).setEtat(0);
 
                     Toast.makeText(getActivity(), "Oeuvre retirée des favoris", Toast.LENGTH_SHORT).show();
 
@@ -368,6 +407,8 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
                 }
 
                 Intent refresh = new Intent(getContext(), MainActivity.class);
+                refresh.putExtra("List", oeuvreList);
+                refresh.putExtra("numOeuvre",numOeuvre);
                 startActivity(refresh);//Start the same Activity
                 getActivity().finish();
 
@@ -376,6 +417,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
                 intent = new Intent(getActivity(), MapActivity.class);
                 intent.putExtra("numOeuvre", numOeuvre);
+                intent.putExtra("List", oeuvreList);
                 startActivity(intent);
                 break;
 
@@ -396,6 +438,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
                         String.valueOf(ratingBar.getRating()),
                         Toast.LENGTH_SHORT).show();
         }
+
     }
 
     @Override
@@ -410,9 +453,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
         if (changesComment== true) {
             String comment = String.valueOf(userC.getText());
-
-            //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            oeuvreList.get(numOeuvre).setCommentaire(comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -421,9 +462,8 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
         if(changesRating== true){
             int rating = (int) ratingBar.getRating();
-            //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
 
+            oeuvreList.get(numOeuvre).setNote(rating);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
             editor.commit();
@@ -444,8 +484,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
         if (changesComment == true) {
             String comment = String.valueOf(userC.getText());
 
-            //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            oeuvreList.get(numOeuvre).setCommentaire(comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -454,8 +493,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
         if(changesRating == true){
             int rating = (int) ratingBar.getRating();
-            //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
+            oeuvreList.get(numOeuvre).setNote(rating);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
@@ -476,8 +514,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
         if (changesComment == true) {
             String comment = String.valueOf(userC.getText());
 
-            //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
+            oeuvreList.get(numOeuvre).setCommentaire(comment);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
@@ -486,8 +523,7 @@ public class FicheFragment extends Fragment implements View.OnClickListener {
 
         if(changesRating== true){
             int rating = (int) ratingBar.getRating();
-            //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
+            oeuvreList.get(numOeuvre).setNote(rating);
 
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
