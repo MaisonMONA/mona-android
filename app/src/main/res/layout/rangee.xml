@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:gravity="center_vertical">
+    android:descendantFocusability="blocksDescendants"
 
     <LinearLayout
         android:orientation="vertical"
@@ -25,14 +26,5 @@
             android:id="@+id/rangee_sub" />
     </LinearLayout>
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/state_button"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentTop="false"
-        android:layout_marginRight="3dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true" />
 
 </RelativeLayout>

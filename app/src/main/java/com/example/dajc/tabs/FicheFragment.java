@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -25,13 +26,17 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static android.content.ContentValues.TAG;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -57,9 +62,6 @@ FicheFragment extends Fragment implements View.OnClickListener {
     String today;
     EditText userC;
     RatingBar ratingBar;
-
-    Cursor c;
-
     String titre_o;
     String tech_nbr;
     String cat_nbr;
@@ -94,8 +96,11 @@ FicheFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fiche, container, false);
         Bundle bundle = this.getArguments();
-        oeuvreList = bundle.getParcelableArrayList("List");
-        System.out.println(oeuvreList.get(2).getTitre());
+        oeuvreList = FirstActivity.getOeuvreList();
+        if (oeuvreList==null){
+            new getOeuvre().execute();
+            System.out.println("Was null");
+        }
         numOeuvre = bundle.getInt("numOeuvre",0);
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
@@ -108,6 +113,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
         date_ajout = (TextView) v.findViewById(R.id.tv_date);
         userC = (EditText) v.findViewById(R.id.user_comment);
         ratingBar = (RatingBar) v.findViewById(R.id.ratingBar);
+        //System.out.println(oeuvreList.get(2).getTitre());
 
         fav_b.setOnClickListener(this);
         cam_b.setOnClickListener(this);
@@ -245,7 +251,8 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
 
         //set artist(s) name(s)
-        String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
+        //String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
+        String o_artistes = oeuvreList.get(numOeuvre).getArtiste();
         author.setText(o_artistes);
 
         //date de la photo
@@ -317,6 +324,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
     public void loadFiche(String id) {
         //get content for the Fiche
         int numOeuvre= parseInt(id);
+        System.out.println(numOeuvre);
         String titre_o = oeuvreList.get(numOeuvre).getTitre();
         String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
         String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
@@ -337,12 +345,13 @@ FicheFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
+        System.out.println(requestCode == REQUEST_IMAGE_PICTURE && resultCode !=0);
         if(requestCode == REQUEST_IMAGE_PICTURE && resultCode !=0){
 
             Bundle extras = data.getExtras();
+            oeuvreList = extras.getParcelableArrayList("List");
             Bitmap imageBitmap = (Bitmap)extras.get("data");
-
+            //new getOeuvre().execute();
             if(imageBitmap != null) {
                 photo.setImageBitmap(imageBitmap);
             }
@@ -380,7 +389,6 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
         }
     }
-
     @Override
     public void onClick(View v) {
         Intent intent;
@@ -391,7 +399,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
                     //méthode qui change l'état dans la base de données
                     oeuvreList.get(numOeuvre).setEtat(1);
-
+                    new updateOeuvre().execute(oeuvreList.get(numOeuvre));
                     Toast.makeText(getActivity(), "Oeuvre ajoutée aux favoris", Toast.LENGTH_SHORT).show();
                 }
                 else if (etat_o==1){
@@ -423,7 +431,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
             case R.id.button_cam:
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
+                intent.putExtra("List", oeuvreList);
                 startActivityForResult(intent, REQUEST_IMAGE_PICTURE);
                 break;
 
@@ -528,6 +536,16 @@ FicheFragment extends Fragment implements View.OnClickListener {
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
             editor.commit();
+        }
+    }
+    private class getOeuvre extends AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            System.out.println("Isnt null anymore");
+            oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
+            return null;
         }
     }
 }

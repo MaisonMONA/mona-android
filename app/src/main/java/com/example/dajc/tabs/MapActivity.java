@@ -32,18 +32,16 @@ import java.util.ArrayList;
  */
 public class MapActivity extends Activity implements LocationListener {
 
-    DBHelper dbh;
     MapView map;
     IMapController mapController;
     ResourceProxy mResourceProxy;
     GeoPoint startPoint;
-    String numOeuvre;
-    Cursor resul_sql;
+    int numOeuvre;
     double lati;
     double longi;
 
     String titre;
-    String etat;
+    int etat;
     String noOeuvre;
     double o_lati;
     double o_longi;
@@ -61,15 +59,14 @@ public class MapActivity extends Activity implements LocationListener {
         setContentView(R.layout.map_layout);
 
         Intent intent = getIntent();
-        numOeuvre = intent.getStringExtra("numOeuvre");
+        numOeuvre = intent.getIntExtra("numOeuvre",0);
+        OeuvreObject oeuvre = FirstActivity.getOeuvreList().get(numOeuvre);
 
-        resul_sql = dbh.retourneOeuvre(numOeuvre);
-        resul_sql.moveToFirst();
-        titre = resul_sql.getString(resul_sql.getColumnIndex(DBHelper.O_TITRE));
-        etat = resul_sql.getString(resul_sql.getColumnIndex(DBHelper.O_ETAT));
-        noOeuvre = resul_sql.getString(resul_sql.getColumnIndex(DBHelper.O_ID));
-        o_lati = resul_sql.getDouble(resul_sql.getColumnIndex(DBHelper.O_COORD_LAT));
-        o_longi = resul_sql.getDouble(resul_sql.getColumnIndex(DBHelper.O_COORD_LONG));
+        titre = oeuvre.getTitre();
+        etat = oeuvre.getEtat();
+        noOeuvre = oeuvre.getId();
+        o_lati = oeuvre.getLocationX();
+        o_longi = oeuvre.getLocationY();
 
         //set map view
         map = (MapView) findViewById(R.id.map);
@@ -100,7 +97,7 @@ public class MapActivity extends Activity implements LocationListener {
 
         OverlayItem myOverlayItem;
 
-        myOverlayItem = new OverlayItem(titre, etat, new GeoPoint(o_lati, o_longi));
+        myOverlayItem = new OverlayItem(titre, noOeuvre, new GeoPoint(o_lati, o_longi));
         items.add(myOverlayItem);
 
         ItemizedIconOverlay.OnItemGestureListener<OverlayItem> iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {

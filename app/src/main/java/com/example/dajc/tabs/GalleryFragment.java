@@ -17,10 +17,8 @@ import android.widget.SimpleCursorAdapter;
  */
 public class GalleryFragment extends Fragment implements AdapterView.OnItemClickListener{
 
-    DBHelper dbh;
     ListView lv;
-    Cursor c;
-    public static SimpleCursorAdapter sca;
+    public static GalleryAdaptor sca;
 
     public GalleryFragment(){
        // this.dbh =  FirstActivity.getDBH();
@@ -34,14 +32,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
         lv = (ListView)v.findViewById(R.id.listView);
 
-        //Cursor here should just get the ones with etat equal to "galerie"
-        c = dbh.listeTableOrd(dbh.TABLE_OEUVRES, dbh.O_ETAT, dbh.ETAT_GALERIE, dbh.O_DATE_IMAGE);
-        //Cursor c= dbh.listeTable(dbh.TABLE_OEUVRES,dbh.O_TITRE );
-
-        String[] from ={ DBHelper.O_ID, DBHelper.O_TITRE, DBHelper.O_DATE_IMAGE };
-        int[] to = {0, android.R.id.text1, android.R.id.text2};
-        sca = new GalleryAdaptor(getContext(), android.R.layout.simple_list_item_2, c, from, to, 0,dbh);
-
+        sca = new GalleryAdaptor(getContext(), android.R.layout.simple_list_item_2);
 
         lv.setAdapter(sca);
 
@@ -52,10 +43,8 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        c.moveToPosition(position);
-        String numOeuvre = c.getString(c.getColumnIndex(dbh.O_ID));
         Intent intent= new Intent(getActivity(), FicheActivity.class);
-        intent.putExtra("numOeuvre", numOeuvre);
+        intent.putExtra("numOeuvre", position);
         startActivity(intent);
     }
 }

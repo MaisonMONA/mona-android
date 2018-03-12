@@ -1,28 +1,26 @@
 package com.example.dajc.tabs;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.Build;
+import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
+import android.widget.RadioGroup;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-/**
- * Created by DAJC on 2016-04-21.
- */
-public class ListViewActivity extends Activity implements AdapterView.OnItemClickListener {
+
+public class ListViewFragment extends Fragment implements AdapterView.OnItemClickListener{
     ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
     static double user_longi;
     static double user_lati;
@@ -30,79 +28,65 @@ public class ListViewActivity extends Activity implements AdapterView.OnItemClic
     RadioButton rb_quart;
     RadioButton rb_title;
     RadioButton rb_art;
+    View v;
     ListView lv;
+    RadioGroup rg;
 
-    public ListViewActivity(){
 
+    public ListViewFragment() {
+        // Required empty public constructor
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        //get data for user location
-        Intent intent = getIntent();
-        Bundle bundle = getIntent().getExtras();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        Bundle bundle = this.getArguments();
         oeuvreList = bundle.getParcelableArrayList("List");
-        System.out.println(oeuvreList.get(2).getTitre()+"ok");
-        try {
-            user_longi = Double.parseDouble(intent.getStringExtra("Geo_longi"));
-            user_lati = Double.parseDouble(intent.getStringExtra("Geo_lati"));
-        }
-        catch(NumberFormatException e)
-        {
-            Toast.makeText(getApplicationContext(), "Activer le GPS pour le tri par distance", Toast.LENGTH_LONG).show();
-        }
-        //for debug
-        Log.d("ListView gps", "Longitude utilisateur = "+user_longi);
-        Log.d("ListView gps", "Latitude utilisateur = " + user_lati);
+        v = inflater.inflate(R.layout.listview_tri, container, false);
 
-        //set View
-        setContentView(R.layout.listview_tri);
-
-        lv = (ListView)findViewById(R.id.listView);
+        lv = (ListView)v.findViewById(R.id.listView);
 
         lv.setOnItemClickListener(this);
+        rb_dist = (RadioButton) v.findViewById(R.id.rb_distance);
+        rb_quart = (RadioButton) v.findViewById(R.id.rb_quartier);
+        rb_title = (RadioButton) v.findViewById(R.id.rb_title);
+        rb_art = (RadioButton) v.findViewById(R.id.rb_art);
+        rg=(RadioGroup) v.findViewById(R.id.rb_sort);
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+               // Check which radio button was clicked
+                View radioButton = rg.findViewById(checkedId);
+                int index = rg.indexOfChild(radioButton);
 
-        rb_dist = (RadioButton) findViewById(R.id.rb_distance);
-        rb_quart = (RadioButton) findViewById(R.id.rb_quartier);
-        rb_title = (RadioButton) findViewById(R.id.rb_title);
-        rb_art = (RadioButton) findViewById(R.id.rb_art);
-        //rb_dist.setOnClickListener(onRadioButtonClicked());
+                switch(index) {
+                    case 1:
+                            sortDist();
+                        break;
+                    case 2:
+                            sortQuartier();
+                        break;
+                    case 3:
+                            sortArtiste();
+                        break;
+                    case 4:
+                            sortTitre();
+                        break;
+                }
+            }
+        });
         //rb_title.setChecked(true);
         showList();
+        return v;
     }
 
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
 
-        // Check which radio button was clicked
-        switch(view.getId()) {
-            case R.id.rb_distance:
-                if (checked)
-                    sortDist();
-                break;
-            case R.id.rb_quartier:
-                if (checked)
-                    sortQuartier();
-                break;
-            case R.id.rb_art:
-                if (checked)
-                    sortArtiste();
-                break;
-            case R.id.rb_title:
-                if (checked)
-                    sortTitre();
-                break;
-        }
-    }
+
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d("onItemClick", "item was clicked "+position);
 
-        Intent intent= new Intent(this, FicheActivity.class);
+        Intent intent= new Intent(getActivity(), FicheActivity.class);
         intent.putExtra("numOeuvre", position);
         intent.putExtra("List",oeuvreList);
 
@@ -110,7 +94,7 @@ public class ListViewActivity extends Activity implements AdapterView.OnItemClic
     }
     protected void showList()
     {
-        AdapterOeuvre adapter = new AdapterOeuvre(getApplicationContext(),R.layout.rangee);
+        AdapterOeuvre adapter = new AdapterOeuvre(getContext(),R.layout.rangee);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(this);
         adapter.addAll(oeuvreList);
@@ -218,4 +202,5 @@ public class ListViewActivity extends Activity implements AdapterView.OnItemClic
     public void onItemClick(View view) {
     }
     */
+
 }

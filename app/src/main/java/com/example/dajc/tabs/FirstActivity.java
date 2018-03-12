@@ -1,6 +1,7 @@
 package com.example.dajc.tabs;
 
 import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -33,38 +34,50 @@ import static android.content.ContentValues.TAG;
  * Created by LenaMK on 17/06/2016.
  */
 public class FirstActivity extends Activity {//implements View.OnClickListener{
-/**
+
+    public static ArrayList<OeuvreObject> getOeuvreList() {
+        return oeuvreList;
+    }
+
+    /**
     Button info;
     Button launch;
-**/ ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
+**/ static ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
+    public static AppDatabase db;
+    public static AppDatabase getDb(){return db;}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.first_activity);
 
-        RunAPI run = new RunAPI(this, this);
-        run.execute();
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "oeuvre-database").build();
+
         //TODO faire les quatres cas... pour le moment seul trois cas fonctionnent
         if (isNetworkAvailable()) {
-            if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
+            /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
             {
                 new GetOeuvres().execute();
             }
-            else{
+            else{*/
                 new UpdateOeuvres().execute();
-            }
+            //}
         }
         else{
-            if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
-            {
+            /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
+            {*/
                 System.out.println("No network");
                 createList(getFile());
-
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("List", oeuvreList);
+                startActivity(intent);
+/*
             }
             else{
                 System.out.println("No network and no data");
             }
+            */
         }
 
 
@@ -168,7 +181,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
     }
     public boolean fileExist(String fname){
-        /*
+/*
         File file = getBaseContext().getFileStreamPath(fname);
         return file.exists();
         */
@@ -222,41 +235,52 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
                 // looping through All Contacts
                 for (int i = 0; i < oeuvres.length(); i++) {
-                    JSONObject c = oeuvres.getJSONObject(i);
-                    String titre = c.getString("Titre");
-                    String date = c.getString("DateFinProduction");
-                    String materiaux = c.getString("Materiaux");
-                    //String id =c.getString("id");
+
                     String id= String.valueOf(i);
-                    //Rajouter le colet quartier dans le fichier JSON
-                    String quartier= c.getString("Arrondissement");
-                    String dimension= c.getString("DimensionsGenerales");
-                    String technique= c.getString("Technique");
-                    JSONArray artisteArray = c.getJSONArray("Artistes");
-                    JSONObject artisteinfo = artisteArray.getJSONObject(0);
-                    String artiste_nom = artisteinfo.getString("Nom");
-                    String artiste_id = artisteinfo.getString("Prenom");
-                    String artiste_prenom = artisteinfo.getString("NoInterne");
-                    String artiste_collectif = artisteinfo.getString("NomCollectif");
-                    double locX=c.getDouble("CoordonneeLatitude");
-                    double locY=c.getDouble("CoordonneeLongitude");
-                    ArtisteObject artiste;
-                    if (artiste_collectif.equals("null")) {
-                        artiste = new ArtisteObject(artiste_nom, artiste_prenom, artiste_id,false );
+                    if (db.getOeuvreDao().verifyID(id).isEmpty()) {
+                        System.out.println("not in bd");
+                        JSONObject c = oeuvres.getJSONObject(i);
+                                String titre = c.getString("Titre");
+                        String date = c.getString("DateFinProduction");
+                        String materiaux = c.getString("Materiaux");
+                        //String id =c.getString("id");
+                        //Rajouter le colet quartier dans le fichier JSON
+                        String quartier = c.getString("Arrondissement");
+                        String dimension = c.getString("DimensionsGenerales");
+                        String technique = c.getString("Technique");
+                        JSONArray artisteArray = c.getJSONArray("Artistes");
+                        JSONObject artisteinfo = artisteArray.getJSONObject(0);
+                        String artiste_nom = artisteinfo.getString("Nom");
+                        String artiste_id = artisteinfo.getString("Prenom");
+                        String artiste_prenom = artisteinfo.getString("NoInterne");
+                        String artiste_collectif = artisteinfo.getString("NomCollectif");
+                        double locX = c.getDouble("CoordonneeLatitude");
+                        double locY = c.getDouble("CoordonneeLongitude");
+                        ArtisteObject artiste;
+                        if (artiste_collectif.equals("null")) {
+                            artiste = new ArtisteObject(artiste_nom, artiste_prenom, artiste_id, false);
+                        } else {
+                            artiste = new ArtisteObject(artiste_collectif, artiste_prenom, artiste_id, true);
+                        }
+
+                        OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                        //artiste.addOeuvres(oeuvre);
+                        db.getOeuvreDao().insertAll(oeuvre);
                     }
                     else{
-                        artiste = new ArtisteObject(artiste_collectif, artiste_prenom, artiste_id,true );
+                        System.out.println("Already in bd");
                     }
-
-                    OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste ,date,materiaux,locX,locY,0,"","",-1,quartier,dimension,technique);
-                    //artiste.addOeuvres(oeuvre);
-
                     // adding contact to contact list
-                    oeuvreList.add(oeuvre);
                 }
+                oeuvreList.addAll(db.getOeuvreDao().getAllOeuvre());
+                //oeuvreList.add(oeuvre);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+        else{
+            oeuvreList.addAll(db.getOeuvreDao().getAllOeuvre());
         }
     }
 

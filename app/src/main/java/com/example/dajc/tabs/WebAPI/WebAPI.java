@@ -1,6 +1,5 @@
 package com.example.dajc.tabs.WebAPI;
 
-import com.example.dajc.tabs.DBHelper;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
@@ -18,11 +17,9 @@ import okhttp3.Response;
 public class WebAPI {
     public String url;
     public Oeuvre[] root;
-    DBHelper dbh;
 
-    public WebAPI(DBHelper dbh){
+    public WebAPI(){
         url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
-        this.dbh = dbh;
     }
 
     public Oeuvre[] run () throws IOException {
@@ -44,6 +41,7 @@ public class WebAPI {
         repareTextesNuls(root);
 
         if (root.length != 0){
+            /*
             //ajout des artistes
             dbh.ajouteArtiste(root);
 
@@ -61,6 +59,7 @@ public class WebAPI {
 
             //ajoute les oeuvre et les liens oeuvre-artiste
             dbh.ajouteOeuvres(root);
+            */
         }
 
 

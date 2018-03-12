@@ -18,12 +18,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 /**
  * Created by LenaMK on 01/07/2016.
  */
 public class PhotoActivity extends Activity{
-    DBHelper dbh;
-
     String title;
     String author;
     String date_ajout;
@@ -31,7 +31,7 @@ public class PhotoActivity extends Activity{
     String user_c;
     String numOeuvre;
     int user_r;
-
+    AppDatabase db;
     TextView p_title;
     TextView p_author;
     TextView p_date_ajout;
@@ -39,7 +39,7 @@ public class PhotoActivity extends Activity{
     ImageView photo;
     RatingBar p_rating;
     SharedPreferences changes;
-
+    OeuvreObject oeuvre;
     public PhotoActivity() {
        // this.dbh = FirstActivity.getDBH();
     }
@@ -50,7 +50,6 @@ public class PhotoActivity extends Activity{
 
 
         setContentView(R.layout.photo);
-
         p_title = (TextView) findViewById(R.id.photo_titre);
         p_author = (TextView) findViewById(R.id.photo_artiste);
         p_date_ajout = (TextView) findViewById(R.id.photo_dateAjout);
@@ -60,22 +59,19 @@ public class PhotoActivity extends Activity{
 
         Intent intent = getIntent();
         numOeuvre = intent.getStringExtra("numOeuvre");
-
-        Cursor c = dbh.retourneOeuvre(numOeuvre);
-        c.moveToFirst();
-
+        List<OeuvreObject> list = FirstActivity.getDb().getOeuvreDao().verifyID(numOeuvre);
+        oeuvre = list.get(0);
         //récupère les données dans c;
-        title = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
-        uri_photo = c.getString(c.getColumnIndex(DBHelper.O_URI_IMAGE));
-        date_ajout= c.getString(c.getColumnIndex(DBHelper.O_DATE_IMAGE));
-        user_c = c.getString(c.getColumnIndex(DBHelper.O_COMMENT));
-        user_r = c.getInt(c.getColumnIndex(DBHelper.O_RATING));
-        c.close();
+        title = oeuvre.getTitre();
+        uri_photo = oeuvre.getURI();
+        date_ajout= oeuvre.getDatedePhoto();
+        user_c = oeuvre.getCommentaire();
+        user_r = oeuvre.getNote();
 
 
         p_title.setText(title);
 
-        author = dbh.retourneNomsArtistes(numOeuvre);
+        author = oeuvre.getArtiste();
 
         p_author.setText(author);
 
@@ -85,8 +81,8 @@ public class PhotoActivity extends Activity{
 
 
         //image de l'oeuvre ou par défaut
-        if (uri_photo.equals(dbh.URI_DEF)) {
-            Picasso.with(this).load(uri_photo).resize(500, 888).into(photo);
+        if (uri_photo.equals("")) {
+            Picasso.with(this).load(R.mipmap.ic_favorite_passive).resize(500, 888).into(photo);
             photo.setVisibility(View.VISIBLE);
         } else {
             Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
@@ -143,8 +139,8 @@ public class PhotoActivity extends Activity{
             String comment = String.valueOf(p_user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
-
+            oeuvre.setCommentaire(comment);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
             editor.commit();
@@ -153,8 +149,8 @@ public class PhotoActivity extends Activity{
         if(changesRating){
             int rating = (int) p_rating.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
-
+            oeuvre.setNote(rating);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
             editor.commit();
@@ -175,8 +171,8 @@ public class PhotoActivity extends Activity{
             String comment = String.valueOf(p_user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
-
+            oeuvre.setCommentaire(comment);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
             editor.commit();
@@ -185,8 +181,8 @@ public class PhotoActivity extends Activity{
         if(changesRating){
             int rating = (int) p_rating.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
-
+            oeuvre.setNote(rating);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
             editor.commit();
@@ -207,8 +203,8 @@ public class PhotoActivity extends Activity{
             String comment = String.valueOf(p_user_c.getText());
 
             //add modified value to DB
-            dbh.ajouteComment(numOeuvre, comment);
-
+            oeuvre.setCommentaire(comment);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("comment", false);
             editor.commit();
@@ -217,8 +213,8 @@ public class PhotoActivity extends Activity{
         if(changesRating){
             int rating = (int) p_rating.getRating();
             //add modified value to DB
-            dbh.ajouteRating(numOeuvre, rating);
-
+            oeuvre.setNote(rating);
+            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
             SharedPreferences.Editor editor = changes.edit() ;
             editor.putBoolean("rating", false);
             editor.commit();

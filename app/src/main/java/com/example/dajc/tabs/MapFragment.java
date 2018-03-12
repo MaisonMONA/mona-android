@@ -58,8 +58,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
     View v;
 
-    DBHelper dbh;
-
     public MapFragment (){
         //this.dbh = FirstActivity.getDBH();
 
@@ -69,7 +67,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = this.getArguments();
-        oeuvreList = bundle.getParcelableArrayList("List");        v = inflater.inflate(R.layout.map_frag_layout, container, false);
+        oeuvreList = FirstActivity.getOeuvreList();
+        v = inflater.inflate(R.layout.map_frag_layout, container, false);
         listViewButton = (ImageButton) v.findViewById(R.id.button_listView);
         listViewButton.setOnClickListener(this);
 
@@ -119,7 +118,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         //         new ArrayList<OverlayItem>(), artMarker, null,
          //       new DefaultResourceProxyImpl(getActivity()));
 
-
+        ArrayList<OverlayItem> items2 = new ArrayList<OverlayItem>();
         // example items.add(new OverlayItem("Title", "Description", new GeoPoint(0.0d,0.0d))); // Lat/Lon decimal degrees
         String title;
         String id;
@@ -136,12 +135,22 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
             art_lati = oeuvreList.get(i).getLocationX();
             art_longi = oeuvreList.get(i).getLocationY();
+            if (oeuvreList.get(i).getEtat()==1)
+            {
+                System.out.println("All good");
+                OverlayItem myOverlayItem2 = new OverlayItem(title, id, new GeoPoint(art_lati, art_longi));
+                items2.add(myOverlayItem2);
+            }
+            else {
+                //System.out.println(oeuvreList.get(i).getEtat());
 
-            myOverlayItem = new OverlayItem(title, id, new GeoPoint(art_lati, art_longi));
-            items.add(myOverlayItem);
-
+                myOverlayItem = new OverlayItem(title, id, new GeoPoint(art_lati, art_longi));
+                items.add(myOverlayItem);
+            }
             item_nb++;
         }
+
+
 /*
         while (!c.isAfterLast()) {
             title = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
@@ -194,14 +203,14 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         map.getOverlays().add(mOverlay);
 
 
-/*
-        Drawable artMarker = getResources().getDrawable(R.drawable.ic_map_person);
+
+        Drawable artMarker = getResources().getDrawable(R.mipmap.ic_favorite_active);
         ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<OverlayItem>(
-                items, artMarker, null,
+                items2, artMarker, null,
                 new DefaultResourceProxyImpl(getActivity()));
 
         map.getOverlays().add(overlay);
-*/
+
         Log.d("map", "Overlay added");
 
         return v;
@@ -271,7 +280,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_listView:
-                Intent intent = new Intent(getActivity(), ListViewActivity.class);
+               /* Intent intent = new Intent(getActivity(), ListViewActivity.class);
                 String longi_s;
                 String lati_s;
                 if (myLocation != null) {
@@ -284,7 +293,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 intent.putExtra("Geo_longi", longi_s);
                 intent.putExtra("Geo_lati", lati_s);
                 intent.putExtra("List",oeuvreList);
-                startActivity(intent);
+                startActivity(intent);*/
                 break;
             case R.id.button_location:
                 startPoint = new GeoPoint(lati, longi);

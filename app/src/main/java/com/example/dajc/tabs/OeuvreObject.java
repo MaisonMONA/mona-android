@@ -1,16 +1,19 @@
 package com.example.dajc.tabs;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * Created by emile on 2018-02-06.
  */
-
+@Entity (tableName = "oeuvre")
 public class OeuvreObject implements Parcelable {
 
     public String Titre;
-    public String Id;
+    @PrimaryKey @NonNull public String Id;
     public int Etat;
     public String URI;
     public String Commentaire;
@@ -18,7 +21,8 @@ public class OeuvreObject implements Parcelable {
     public String Quartier;
     public String Dimension;
     public String Technique;
-    public ArtisteObject Artiste;
+    //public ArtisteObject Artiste;
+    public String Artiste;
     public String DatedeCreation;
     public String Materiaux;
     public double LocationX;
@@ -37,10 +41,12 @@ public class OeuvreObject implements Parcelable {
     public String getTitre() {
         return Titre;
     }
-
+    /*
     public ArtisteObject getArtiste() {
         return Artiste;
     }
+*/
+    public String getArtiste(){return Artiste;}
 
     public String getDatedeCreation() {
         return DatedeCreation;
@@ -121,8 +127,8 @@ public class OeuvreObject implements Parcelable {
     public void setId(String id) {
         Id = id;
     }
-
-    public OeuvreObject(String titre, String id, ArtisteObject artiste, String datedeCreation, String materiaux, double locationX, double locationY, int etat, String URI, String commentaire, int note, String quartier, String dimension, String technique) {
+    public OeuvreObject(){};
+    public OeuvreObject(String titre, String id, String artiste, String datedeCreation, String materiaux, double locationX, double locationY, int etat, String URI, String commentaire, int note, String quartier, String dimension, String technique) {
         Titre = titre;
         Id = id;
         Artiste = artiste;
@@ -152,7 +158,8 @@ public class OeuvreObject implements Parcelable {
         this.Etat = in.readInt();
         this.Id = in.readString();
         this.Titre = in.readString();
-        Artiste = (ArtisteObject) in.readValue(ArtisteObject.class.getClassLoader());
+        //Artiste = (ArtisteObject) in.readValue(ArtisteObject.class.getClassLoader());
+        this.Artiste = in.readString();
         this.DatedeCreation = in.readString();
         this.Materiaux = in.readString();
         this.LocationX = in.readDouble();
@@ -178,7 +185,8 @@ public class OeuvreObject implements Parcelable {
         dest.writeInt(this.Etat);
         dest.writeString(this.Id);
         dest.writeString(this.Titre);
-        dest.writeValue(Artiste);
+        //dest.writeValue(Artiste);
+        dest.writeString(this.Artiste);
         dest.writeString(this.DatedeCreation);
         dest.writeString(this.Materiaux);
         dest.writeDouble(this.LocationX);

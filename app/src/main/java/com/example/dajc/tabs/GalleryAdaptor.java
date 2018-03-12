@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -16,22 +17,15 @@ import java.util.ArrayList;
 /**
  * Created by DAJC on 2016-04-19.
  */
-public class GalleryAdaptor extends SimpleCursorAdapter {
+public class GalleryAdaptor extends ArrayAdapter<OeuvreObject> {
 
     private ArrayList<Boolean> itemChecked = new ArrayList<Boolean>();
-    private Cursor c;
     private Context context;
-    public DBHelper dbh;
 
-    public GalleryAdaptor(Context context, int layout, Cursor c, String[] from, int[] to, int flags, DBHelper dbh) {
-        super(context, layout, c, from, to, flags);
-        this.c = c;
+    public GalleryAdaptor(Context context, int layout) {
+        super(context, layout);
         this.context = context;
-        this.dbh = dbh;
 
-        for (int i = 0; i < this.getCount(); i++) {
-            itemChecked.add(i, false); // initializes all items value with false
-        }
 
     }
 
@@ -45,13 +39,13 @@ public class GalleryAdaptor extends SimpleCursorAdapter {
 
         TextView tv_titre = (TextView)inView.findViewById(R.id.photoRangee_title);
         TextView tv_sub = (TextView)inView.findViewById(R.id.photoRangee_subtitle);
+        OeuvreObject oeuvre = FirstActivity.getOeuvreList().get(pos);
 
-        c.moveToPosition(pos);
-        String titre = c.getString(c.getColumnIndex(dbh.O_TITRE));
-        String numOeuvre = c.getString(c.getColumnIndex(dbh.O_ID));
-        String uri = c.getString(c.getColumnIndex(dbh.O_URI_IMAGE));
+        String titre = oeuvre.getTitre();
+        String numOeuvre = oeuvre.getId();
+        String uri = oeuvre.getURI();
 
-        String date = dbh.retourneDatephoto(numOeuvre);
+        String date = oeuvre.getDatedePhoto();
         tv_titre.setText(titre);
         tv_sub.setText(date);
 

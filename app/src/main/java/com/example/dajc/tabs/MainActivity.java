@@ -56,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Bundle bundle = getIntent().getExtras();
+        /*Bundle bundle = getIntent().getExtras();
         oeuvreList = bundle.getParcelableArrayList("List");
-
+        if (oeuvreList==null) {
+        */
+            new getOeuvre().execute();
+        //}
 
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         pager = (ViewPager) findViewById(R.id.pager);
@@ -155,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new FicheFragment();
             } else if (position == 1){
                 fragment = new MapFragment();
-            } /*else  {
-                fragment = new WishListFragment();
+            } else if (position == 2){
+                fragment = new ListViewFragment();
             }
             /*else {
                 fragment = new GalleryFragment();
@@ -264,6 +266,15 @@ public class MainActivity extends AppCompatActivity {
             return enabled;
         }
 
+    }
+    private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
+
+
+        @Override
+        protected ArrayList<OeuvreObject> doInBackground(Void... voids) {
+            oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
+            return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
+        }
     }
 
 

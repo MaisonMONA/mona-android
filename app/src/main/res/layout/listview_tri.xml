@@ -29,13 +29,13 @@
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:id="@+id/rb_sort">
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Distance"
                     android:id="@+id/rb_distance"
-                    android:onClick="onRadioButtonClicked"
                     android:checked="true" />
 
                 <RadioButton
@@ -43,21 +43,18 @@
                     android:layout_height="wrap_content"
                     android:text="Quartier"
                     android:id="@+id/rb_quartier"
-                    android:onClick="onRadioButtonClicked"
                     android:checked="false" />
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Quartier"
                     android:id="@+id/rb_title"
-                    android:onClick="onRadioButtonClicked"
                     android:checked="false" />
                 <RadioButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Quartier"
                     android:id="@+id/rb_art"
-                    android:onClick="onRadioButtonClicked"
                     android:checked="false" />
             </RadioGroup>
         </LinearLayout>

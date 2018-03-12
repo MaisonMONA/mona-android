@@ -37,7 +37,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
     static final int REQUEST_IMAGE_PICTURE = 1;
     ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
     static int position;
-
+    AppDatabase db;
     TextView title;
     TextView author;
     TextView date;
@@ -52,7 +52,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
 
     int numOeuvre;
 
-    String etat_o;
+    int etat_o;
     String id;
     String user_comment;
     int user_rating;
@@ -81,7 +81,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         date_ajout = (TextView) findViewById(R.id.tv_date);
         user_c = (EditText) findViewById(R.id.user_comment);
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
-
+        db=FirstActivity.getDb();
         Intent intent = getIntent();
         numOeuvre = intent.getIntExtra("numOeuvre",0);
 
@@ -95,13 +95,14 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
         user_comment = oeuvreList.get(numOeuvre).getTitre();
         user_rating = oeuvreList.get(numOeuvre).getEtat();
-        etat_o = oeuvreList.get(numOeuvre).getTitre();
+        etat_o = oeuvreList.get(numOeuvre).getEtat();
         //set title
         title.setText(titre_o);
 
 
         //set artist(s) name(s)
-        String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
+        //String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
+        String o_artistes = oeuvreList.get(numOeuvre).getArtiste();
         author.setText(o_artistes);
 
         //date de la photo
@@ -130,20 +131,23 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
             photo.setImageBitmap(bmImg);
         }
-*/
 
-        //si l'oeuvre est dans les favoris, le bouton n'est "pas actif" donc blanc
-        /*if (etat_o.equals(dbh.ETAT_FAVORIS)) {
+*/
+       //si l'oeuvre est favorite
+        if (etat_o==1) {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
-            date_ajout.setVisibility(date_ajout.GONE);
+            date_ajout.setVisibility(View.GONE);
         }
         //si l'oeuvre est dans la galerie, on ne peut pas prendre de photo ou l'ajouter aux favoris
         //par contre, on affiche la date à laquelle la photo a été prise
-        else if (etat_o.equals(dbh.ETAT_GALERIE)) {
-            Log.d("fiche", "in etat_galerie and trying to hide visibility");
+        else if (etat_o==2) {
+
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
-            fav_b.setVisibility(fav_b.GONE);
-            cam_b.setVisibility(cam_b.GONE);
+            fav_b.setVisibility(View.GONE);
+            cam_b.setVisibility(View.GONE);
+
+        }
+            /*
 
             //date de la photo de l'utilisateur
             String date_photo = dbh.retourneDatephoto(numOeuvre);
@@ -160,12 +164,13 @@ public class FicheActivity extends Activity implements View.OnClickListener {
             }
 
 
-        } else {*/
+        }
+        */else {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
             date_ajout.setVisibility(date_ajout.GONE);
             user_c.setVisibility(user_c.GONE);
             ratingBar.setVisibility(ratingBar.GONE);
-        //}
+        }
 
         changes = getApplicationContext().getSharedPreferences("change_rating", Context.MODE_PRIVATE);
 
@@ -255,6 +260,8 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         Intent intent;
         switch (v.getId()) {
             case R.id.button_fav:
+                oeuvreList.get(numOeuvre).setEtat(1);
+                new updateOeuvre().execute(oeuvreList.get(numOeuvre));
 /*
                 if (etat_o.equals(dbh.ETAT_NORMAL)) {
 
@@ -275,6 +282,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
 
                 Intent refresh = new Intent(this, FicheActivity.class);
                 refresh.putExtra("numOeuvre", numOeuvre);
+                refresh.putExtra("List", oeuvreList);
                 startActivity(refresh);//Start the same Activity
                 this.finish();
 
