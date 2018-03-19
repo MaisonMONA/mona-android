@@ -1,6 +1,8 @@
 package com.example.dajc.tabs;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +56,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     double mtl_lati;
     double mtl_longi;
 
-    ImageButton listViewButton;
     ImageButton locationButton;
 
     View v;
@@ -63,14 +65,13 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
     }
 
+    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle bundle = this.getArguments();
         oeuvreList = FirstActivity.getOeuvreList();
         v = inflater.inflate(R.layout.map_frag_layout, container, false);
-        listViewButton = (ImageButton) v.findViewById(R.id.button_listView);
-        listViewButton.setOnClickListener(this);
 
         locationButton = (ImageButton) v.findViewById(R.id.button_location);
         locationButton.setOnClickListener(this);
@@ -86,16 +87,36 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         //set map default view point
         mapController = map.getController();
         mapController.setZoom(15);
-
-        // localisation
+        //location
         LocationManager locm = (LocationManager)getActivity(). getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity(),"Pas de permission",Toast.LENGTH_LONG).show();
-        }else {
+        if (!MainActivity.Permission.checkPermissionForLocation()) {
+            Toast.makeText(getActivity(),"Pas de permission de location",Toast.LENGTH_LONG).show();
+            MainActivity.Permission.requestPermissionForLocation();
+        }
+        else {
             locm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
         }
+        if (!MainActivity.Permission.checkPermissionForLocationCoarse()) {
+           // MainActivity.Permission.requestPermissionForLocationC();
+        }
 
+
+/*
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            int MY_PERMISSIONS_REQUEST_Location=1;
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_Location);
+            if(!(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                locm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            }
+        }
+        else {
+            locm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        }
+*/
 
 
         //set the start point to user last known location or to mtl
@@ -151,22 +172,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         }
 
 
-/*
-        while (!c.isAfterLast()) {
-            title = c.getString(c.getColumnIndex(DBHelper.O_TITRE));
-            id = c.getString(c.getColumnIndex(DBHelper.O_ID));
-
-            art_lati = c.getDouble(c.getColumnIndex(DBHelper.O_COORD_LAT));
-            art_longi = c.getDouble(c.getColumnIndex(DBHelper.O_COORD_LONG));
-
-            myOverlayItem = new OverlayItem(title, id, new GeoPoint(art_lati, art_longi));
-            items.add(myOverlayItem);
-
-            item_nb++;
-            c.moveToNext();
-
-        }
-*/
         Log.d("map", "Items added = " + item_nb);
 
         ItemizedIconOverlay.OnItemGestureListener<OverlayItem> iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -183,12 +188,9 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             public boolean onItemLongPress(int index, OverlayItem item) {
                 //shows the name of the artwork
                 //should work on getting the fiche
-
-
-                Intent intent = new Intent(getActivity(), FicheActivity.class);
-                intent.putExtra("numOeuvre", item.getSnippet());
-                startActivity(intent);
-
+                System.out.println("item no" + index);
+                MainActivity.oeuvreDuJour=false;
+                MainActivity.listFrag(index);
                 return false;
             }
 
@@ -279,22 +281,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_listView:
-               /* Intent intent = new Intent(getActivity(), ListViewActivity.class);
-                String longi_s;
-                String lati_s;
-                if (myLocation != null) {
-                    longi_s = "" + myLocation.getLongitude();
-                    lati_s = "" + myLocation.getLatitude();
-                } else {
-                    longi_s = "";
-                    lati_s = "";
-                }
-                intent.putExtra("Geo_longi", longi_s);
-                intent.putExtra("Geo_lati", lati_s);
-                intent.putExtra("List",oeuvreList);
-                startActivity(intent);*/
-                break;
             case R.id.button_location:
                 startPoint = new GeoPoint(lati, longi);
                 mapController.setCenter(startPoint);

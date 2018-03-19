@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,18 +19,19 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by LenaMK on 01/07/2016.
  */
-public class PhotoActivity extends Activity{
+public class PhotoActivity extends Activity {
     String title;
     String author;
     String date_ajout;
     String uri_photo;
     String user_c;
-    String numOeuvre;
+    int numOeuvre;
     int user_r;
     AppDatabase db;
     TextView p_title;
@@ -40,8 +42,10 @@ public class PhotoActivity extends Activity{
     RatingBar p_rating;
     SharedPreferences changes;
     OeuvreObject oeuvre;
+    List<OeuvreObject> list;
+
     public PhotoActivity() {
-       // this.dbh = FirstActivity.getDBH();
+        // this.dbh = FirstActivity.getDBH();
     }
 
     @Override
@@ -58,46 +62,15 @@ public class PhotoActivity extends Activity{
         p_rating = (RatingBar) findViewById(R.id.ratingBar);
 
         Intent intent = getIntent();
-        numOeuvre = intent.getStringExtra("numOeuvre");
-        List<OeuvreObject> list = FirstActivity.getDb().getOeuvreDao().verifyID(numOeuvre);
-        oeuvre = list.get(0);
+        numOeuvre = intent.getIntExtra("numOeuvre", 0);
+        new getOeuvre().execute();
         //récupère les données dans c;
-        title = oeuvre.getTitre();
-        uri_photo = oeuvre.getURI();
-        date_ajout= oeuvre.getDatedePhoto();
-        user_c = oeuvre.getCommentaire();
-        user_r = oeuvre.getNote();
-
-
-        p_title.setText(title);
-
-        author = oeuvre.getArtiste();
-
-        p_author.setText(author);
-
-        //date de la photo
-        p_date_ajout.setText(date_ajout);
-
-
-
-        //image de l'oeuvre ou par défaut
-        if (uri_photo.equals("")) {
-            Picasso.with(this).load(R.mipmap.ic_favorite_passive).resize(500, 888).into(photo);
-            photo.setVisibility(View.VISIBLE);
-        } else {
-            Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
-            photo.setImageBitmap(bmImg);
-        }
-
-        p_user_c.setText(user_c);
-        p_rating.setRating((float) user_r);
-
         changes = getApplicationContext().getSharedPreferences("change_rating", Context.MODE_PRIVATE);
 
         p_rating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float rating,
                                         boolean fromUser) {
-                SharedPreferences.Editor editor = changes.edit() ;
+                SharedPreferences.Editor editor = changes.edit();
                 editor.putBoolean("rating", true);
                 editor.commit();
             }
@@ -117,7 +90,7 @@ public class PhotoActivity extends Activity{
 
             @Override
             public void afterTextChanged(Editable s) {
-                SharedPreferences.Editor editor = changes.edit() ;
+                SharedPreferences.Editor editor = changes.edit();
                 editor.putBoolean("comment", true);
                 editor.commit();
             }
@@ -140,18 +113,18 @@ public class PhotoActivity extends Activity{
 
             //add modified value to DB
             oeuvre.setCommentaire(comment);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("comment", false);
             editor.commit();
         }
 
-        if(changesRating){
+        if (changesRating) {
             int rating = (int) p_rating.getRating();
             //add modified value to DB
             oeuvre.setNote(rating);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("rating", false);
             editor.commit();
         }
@@ -172,18 +145,18 @@ public class PhotoActivity extends Activity{
 
             //add modified value to DB
             oeuvre.setCommentaire(comment);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("comment", false);
             editor.commit();
         }
 
-        if(changesRating){
+        if (changesRating) {
             int rating = (int) p_rating.getRating();
             //add modified value to DB
             oeuvre.setNote(rating);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("rating", false);
             editor.commit();
         }
@@ -204,22 +177,58 @@ public class PhotoActivity extends Activity{
 
             //add modified value to DB
             oeuvre.setCommentaire(comment);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("comment", false);
             editor.commit();
         }
 
-        if(changesRating){
+        if (changesRating) {
             int rating = (int) p_rating.getRating();
             //add modified value to DB
             oeuvre.setNote(rating);
-            FirstActivity.getDb().getOeuvreDao().updateUsers(oeuvre);
-            SharedPreferences.Editor editor = changes.edit() ;
+            new updateOeuvre().execute(oeuvre);
+            SharedPreferences.Editor editor = changes.edit();
             editor.putBoolean("rating", false);
             editor.commit();
         }
-
     }
 
-}
+
+    public void treatPhoto() {
+        if (uri_photo.equals("")) {
+            Picasso.with(getApplicationContext()).load(R.mipmap.ic_favorite_passive).resize(500, 888).into(photo);
+            photo.setVisibility(View.VISIBLE);
+        } else {
+            Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
+            photo.setImageBitmap(bmImg);
+        }
+    }
+
+
+    private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
+
+
+        @Override
+        protected ArrayList<OeuvreObject> doInBackground(Void... voids) {
+            list = FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre));
+            oeuvre = list.get(0);
+            title = oeuvre.getTitre();
+            uri_photo = oeuvre.getURI();
+            date_ajout = oeuvre.getDatedePhoto();
+            user_c = oeuvre.getCommentaire();
+            user_r = oeuvre.getNote();
+            p_title.setText(title);
+            author = oeuvre.getArtiste();
+            p_author.setText(author);
+            //date de la photo
+            p_date_ajout.setText(date_ajout);
+            //image de l'oeuvre ou par défaut
+
+            p_user_c.setText(user_c);
+            p_rating.setRating((float) user_r);
+
+            return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
+        }
+
+    }}

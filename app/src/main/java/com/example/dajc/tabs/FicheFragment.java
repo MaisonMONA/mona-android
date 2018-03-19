@@ -6,11 +6,13 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,7 +36,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Random;
 
 import static android.content.ContentValues.TAG;
 import static java.lang.Integer.parseInt;
@@ -46,6 +51,7 @@ public class
 FicheFragment extends Fragment implements View.OnClickListener {
 
     static final int REQUEST_IMAGE_PICTURE = 1;
+    OeuvreObject object;
     int numOeuvre;
     int etat_o;
     ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
@@ -59,7 +65,6 @@ FicheFragment extends Fragment implements View.OnClickListener {
     ImageButton map_b;
     ImageButton cam_b;
     String lastUpdate;
-    String today;
     EditText userC;
     RatingBar ratingBar;
     String titre_o;
@@ -79,29 +84,21 @@ FicheFragment extends Fragment implements View.OnClickListener {
     String user_comment;
     int user_rating;
 
-    String idDuJour;
+    int idDuJour;
 
     SharedPreferences changes;
 
 
 
     public FicheFragment (){
-
-        today = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        Log.d("settings", " today = "+today);
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fiche, container, false);
-        Bundle bundle = this.getArguments();
         oeuvreList = FirstActivity.getOeuvreList();
-        if (oeuvreList==null){
-            new getOeuvre().execute();
-            System.out.println("Was null");
-        }
-        numOeuvre = bundle.getInt("numOeuvre",0);
+        numOeuvre = MainActivity.numOeuvre;
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
         date = (TextView) v.findViewById(R.id.date);
@@ -159,120 +156,19 @@ FicheFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        //randomizes between works that are neither favorites nor in gallery, 1/day
-        SharedPreferences settings = getActivity().getSharedPreferences("firstRun", Context.MODE_PRIVATE);
-        if (settings.getBoolean("isFirstRun", true)) {
-            //on first use, get a first prey of the day
-
-
-            idDuJour = "2";
-
-
-            //create a first lastUpdate
-            lastUpdate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-
-            //update the shared prefs
-
-            SharedPreferences.Editor editor = settings.edit() ;
-            editor.putBoolean("isFirstRun", false);
-            editor.putString("lastUpdate", lastUpdate);
-            editor.putString("idDuJour", idDuJour);
-            editor.commit();
-
-        }
-
-        //lastUpdate should be set on the first run and always be active after
-        String lastU = settings.getString("lastUpdate", "notSet");
-
-        if (lastU.equals("notSet")){
-            //no last update
-            Log.d("settings", "Houston we have a problem");
-        }
-        else if (lastU.equals(today)){
-            //we have a prey of the day, let's load it
-            String todayId;
-            try {
-                todayId = settings.getString("idDuJour", "notSet");
-            }
-            catch (ClassCastException e) {
-                todayId = "2";
-            }
-            if (todayId.equals("notSet")){
-                Log.d("settings", "Houston we have another problem");
-            } else {
-                loadFiche(todayId);
-            }
+        Calendar calendar = Calendar.getInstance();
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        Random rand = new Random(dayOfYear);
+        int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
+        if (MainActivity.oeuvreDuJour == true) {
+            numOeuvre = idDuJour;
         } else {
-            //we need a new prey, let's get it
-            String newId ="2";
-           // do{
-                /*
-                c = dbh.listeTableOrd(dbh.TABLE_OEUVRES, dbh.O_ETAT, dbh.ETAT_NORMAL, "random()");
-                c.moveToFirst();
-                newId = c.getString(c.getColumnIndex(DBHelper.O_ID));
-                c.close();
-                */
-           // }
-            /*
-            while (newId == settings.getString("idDuJour", "notSet"));
-            //just to be sure it's not the same as yesterday
-
-
-            //update the Preferences
-            SharedPreferences.Editor editor = settings.edit() ;
-            String newLastU = new SimpleDateFormat("yyyyMMdd").format(new Date());
-            editor.putString("lastUpdate", newLastU);
-            editor.putString("idDuJour", newId);
-            editor.commit();
-*/
-            //load it
-            loadFiche(newId);
-
+            MainActivity.oeuvreDuJour = true;
         }
-
-
-        //set content
-        Intent intent = getActivity().getIntent();
-        numOeuvre = intent.getIntExtra("numOeuvre",0);
-
-        String titre_o = oeuvreList.get(numOeuvre).getTitre();
-        String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String quart_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String mat_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String dimension_o = oeuvreList.get(numOeuvre).getDimension();
-        String uri_photo = oeuvreList.get(numOeuvre).getURI();
-        String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
-        user_comment = oeuvreList.get(numOeuvre).getCommentaire();
-        user_rating = oeuvreList.get(numOeuvre).getNote();
-        etat_o = oeuvreList.get(numOeuvre).getEtat();
-        //set title
-        title.setText(titre_o);
-
-
-        //set artist(s) name(s)
-        //String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
-        String o_artistes = oeuvreList.get(numOeuvre).getArtiste();
-        author.setText(o_artistes);
-
-        //date de la photo
-        date.setText(date_oeuvre);
-
-        //dimensions de l'oeuvre
-        String dimension = dimension_o;
-
-        //technique
-        String tech_oeuvre = oeuvreList.get(numOeuvre).getTechnique();
-        String cat_oeuvre = oeuvreList.get(numOeuvre).getTitre();
-        String quart_oeuvre = oeuvreList.get(numOeuvre).getQuartier();
-        String mat_oeuvre = oeuvreList.get(numOeuvre).getMateriaux();
-
-
-        String information = "Quartier: " + quart_oeuvre + "\n" + "Dimensions: " + dimension + "\n"
-                + "Catégorie: " + cat_oeuvre + "\n" + "Technique: " + tech_oeuvre + "\n"
-                + "Matériau: " + mat_oeuvre;
-        infos.setText(information);
-
+        new getOeuvre().execute();
+        Log.d("settings", " today = " + idDuJour);
+    }
+    public void finishUI(){
         //image de l'oeuvre ou par défaut
         if (uri_photo.equals("")) {
             //Picasso.with(getContext()).load(uri_photo).resize(500, 888).into(photo);
@@ -282,22 +178,26 @@ FicheFragment extends Fragment implements View.OnClickListener {
             photo.setImageBitmap(bmImg);
         }
 
-
-
+        System.out.println("etat_o = " +etat_o);
         //si l'oeuvre est dans les favoris, le bouton n'est "pas actif" donc blanc
         //etat_o egal 1 sur favori, 2 si dans la gallerie
-        if (etat_o==1) {
+        if (etat_o == 1) {
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
             date_ajout.setVisibility(View.GONE);
         }
+        else{
+            fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
+        }
         //si l'oeuvre est dans la galerie, on ne peut pas prendre de photo ou l'ajouter aux favoris
         //par contre, on affiche la date à laquelle la photo a été prise
-        else if (etat_o==2) {
+        if (etat_o == 2) {
 
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
             fav_b.setVisibility(View.GONE);
             cam_b.setVisibility(View.GONE);
-
+            date_ajout.setVisibility(View.VISIBLE);
+            userC.setVisibility(View.VISIBLE);
+            ratingBar.setVisibility(View.VISIBLE);
 
             //date de la photo de l'utilisateur
             String date_photo = oeuvreList.get(numOeuvre).getDatedePhoto();
@@ -306,7 +206,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
             //clickListener pour agrandir la photo
             photo.setOnClickListener(this);
 
-            if (! user_comment.equals("")){
+            if (!user_comment.equals("")) {
                 userC.setText(user_comment);
             }
             if (user_rating != -1) {
@@ -314,29 +214,41 @@ FicheFragment extends Fragment implements View.OnClickListener {
             }
 
         } else {
-            fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
             date_ajout.setVisibility(View.GONE);
             userC.setVisibility(View.GONE);
             ratingBar.setVisibility(View.GONE);
-       }
+        }
     }
 
-    public void loadFiche(String id) {
+    public void loadFiche() {
         //get content for the Fiche
-        int numOeuvre= parseInt(id);
-        System.out.println(numOeuvre);
-        String titre_o = oeuvreList.get(numOeuvre).getTitre();
-        String tech_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String cat_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String quart_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String mat_nbr = oeuvreList.get(numOeuvre).getTitre();
-        String dimension_o = oeuvreList.get(numOeuvre).getDimension();
-        String uri_photo = oeuvreList.get(numOeuvre).getURI();
-        String date_oeuvre = oeuvreList.get(numOeuvre).getDatedeCreation();
-        user_comment = oeuvreList.get(numOeuvre).getCommentaire();
-        user_rating = oeuvreList.get(numOeuvre).getNote();
-        etat_o = oeuvreList.get(numOeuvre).getEtat();
-
+        titre_o = object.getTitre();
+        tech_nbr = object.getTitre();
+        cat_nbr = object.getTitre();
+        quart_nbr = object.getTitre();
+        mat_nbr = object.getTitre();
+        dimension_o =object.getDimension();
+        uri_photo = object.getURI();
+        date_oeuvre = object.getDatedeCreation();
+        user_comment = object.getCommentaire();
+        user_rating = object.getNote();
+        etat_o = object.getEtat();
+        //set title
+        title.setText(titre_o);
+        //String o_artistes = oeuvreList.get(numOeuvre).getArtiste().getNom();
+        String o_artistes = object.getArtiste();
+        author.setText(o_artistes);
+        date.setText(date_oeuvre);
+        //dimensions de l'oeuvre
+        String dimension = dimension_o;
+        String tech_oeuvre = object.getTechnique();
+        String cat_oeuvre = object.getTitre();
+        String quart_oeuvre = object.getQuartier();
+        String mat_oeuvre = object.getMateriaux();
+        String information = "Quartier: " + quart_oeuvre + "\n" + "Dimensions: " + dimension + "\n"
+                + "Catégorie: " + cat_oeuvre + "\n" + "Technique: " + tech_oeuvre + "\n"
+                + "Matériau: " + mat_oeuvre;
+        infos.setText(information);
 
 
 
@@ -349,7 +261,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
         if(requestCode == REQUEST_IMAGE_PICTURE && resultCode !=0){
 
             Bundle extras = data.getExtras();
-            oeuvreList = extras.getParcelableArrayList("List");
+            oeuvreList = FirstActivity.oeuvreList;
             Bitmap imageBitmap = (Bitmap)extras.get("data");
             //new getOeuvre().execute();
             if(imageBitmap != null) {
@@ -375,13 +287,19 @@ FicheFragment extends Fragment implements View.OnClickListener {
 /*
                 dbh.ajoutePhoto(numOeuvre, currentPath, timeStamp);
                 dbh.changeEtat(numOeuvre, dbh.ETAT_GALERIE);
-*/
+*/              System.out.println("etat_o set to 2");
                 oeuvreList.get(numOeuvre).setDatedePhoto(timeStamp);
                 oeuvreList.get(numOeuvre).setURI(currentPath);
                 oeuvreList.get(numOeuvre).setEtat(2);
-                Intent refresh = new Intent(getContext(), MainActivity.class);
+                new updateOeuvre().execute(oeuvreList.get(numOeuvre));
+                /*Intent refresh = new Intent(getContext(), MainActivity.class);
                 startActivity(refresh);//Start the same Activity
-                getActivity().finish();
+                getActivity().finish();*/
+                /*MainActivity.oeuvreDuJour=false;
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.detach(this).attach(this).commit();*/
+                new getOeuvre().execute();
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -405,7 +323,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 else if (etat_o==1){
 
                    oeuvreList.get(numOeuvre).setEtat(0);
-
+                    new updateOeuvre().execute(oeuvreList.get(numOeuvre));
                     Toast.makeText(getActivity(), "Oeuvre retirée des favoris", Toast.LENGTH_SHORT).show();
 
                 }
@@ -413,13 +331,14 @@ FicheFragment extends Fragment implements View.OnClickListener {
                     Log.d("listViewCursorAdaptor", "on ne peut pas changer l'état: " + etat_o);
 
                 }
-
+                new getOeuvre().execute();
+                /*MainActivity.oeuvreDuJour=false;
                 Intent refresh = new Intent(getContext(), MainActivity.class);
                 refresh.putExtra("List", oeuvreList);
                 refresh.putExtra("numOeuvre",numOeuvre);
                 startActivity(refresh);//Start the same Activity
                 getActivity().finish();
-
+*/
                 break;
             case R.id.button_map:
 
@@ -430,11 +349,44 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.button_cam:
+                if (!MainActivity.Permission.checkPermissionForCamera()) {
+                    MainActivity.Permission.requestPermissionForCamera();
+                }
+                else {
+                    if (!MainActivity.Permission.checkPermissionForExternalStorage()) {
+                        MainActivity.Permission.requestPermissionForExternalStorage();
+                    }
+                    else {
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        /*File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+                        if (!mediaStorageDir.exists()) {
+                            mediaStorageDir.mkdirs();
+                        }
+
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                                Locale.getDefault()).format(new Date());
+                        try {
+                            File mediaFile = File.createTempFile(
+                                    "IMG_" + timeStamp,
+                                    ".jpg",
+                                    mediaStorageDir
+                            );
+                            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mediaFile));*/
+                            MainActivity.oeuvreDuJour=false;
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
+                            break;
+                         /*catch (IOException e) {
+                            e.printStackTrace();
+                        }*/
+                    }
+                }
+/*
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra("List", oeuvreList);
-                startActivityForResult(intent, REQUEST_IMAGE_PICTURE);
+                startActivityForResult(intent, REQUEST_IMAGE_PICTURE);}}
                 break;
-
+*/
             case R.id.photo:
                 intent = new Intent (getActivity(), PhotoActivity.class);
                 intent.putExtra("numOeuvre", numOeuvre);
@@ -545,7 +497,14 @@ FicheFragment extends Fragment implements View.OnClickListener {
         protected Void doInBackground(Void... voids) {
             System.out.println("Isnt null anymore");
             oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
+            object=oeuvreList.get(numOeuvre);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            loadFiche();
+            finishUI();
         }
     }
 }

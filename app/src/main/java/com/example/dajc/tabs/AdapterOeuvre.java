@@ -36,7 +36,7 @@ public class AdapterOeuvre extends ArrayAdapter<OeuvreObject> {
 
             TextView header = (TextView) v.findViewById(R.id.rangee_title);
             TextView description = (TextView) v.findViewById(R.id.rangee_sub);
-            System.out.println(item.getTitre());
+            //System.out.println(item.getTitre());
             header.setText(item.getTitre());
             //description.setText(item.getArtiste().getNom());
             description.setText(item.getArtiste());

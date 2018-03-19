@@ -6,6 +6,8 @@ import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,12 +87,8 @@ public class ListViewFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d("onItemClick", "item was clicked "+position);
-
-        Intent intent= new Intent(getActivity(), FicheActivity.class);
-        intent.putExtra("numOeuvre", position);
-        intent.putExtra("List",oeuvreList);
-
-        startActivity(intent);
+        MainActivity.oeuvreDuJour=false;
+        MainActivity.listFrag((Integer.parseInt(oeuvreList.get(position).getId())));
     }
     protected void showList()
     {

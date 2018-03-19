@@ -33,6 +33,8 @@ public interface OeuvreDao {
     // Gets all people in the database with a favorite color
     @Query("SELECT * FROM oeuvre WHERE Quartier LIKE :quartier")
     List<OeuvreObject> getAllOeuvreQuartier(String quartier);
+    @Query("SELECT * FROM oeuvre WHERE URI!='' ")
+    List<OeuvreObject> getGalleryList();
     @Update
     public void updateUsers(OeuvreObject... oeuvre);
 }

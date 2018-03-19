@@ -195,8 +195,6 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     }
     private String getFile()
     {
-
-        System.out.println("Started");
 //Get the text file
         File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
 
@@ -226,9 +224,6 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         if (jsonStr != null) {
             oeuvreList.clear();
             try {
-                System.out.println(jsonStr.length());
-                //JSONObject jsonObj = new JSONObject(jsonStr.substring(1));
-                System.out.println(jsonStr.length());
                 // Getting JSON Array node
                 JSONArray oeuvres = new JSONArray(jsonStr);
                 System.out.println(jsonStr.length());
@@ -238,7 +233,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
                     String id= String.valueOf(i);
                     if (db.getOeuvreDao().verifyID(id).isEmpty()) {
-                        System.out.println("not in bd");
+                        //System.out.println("not in bd");
                         JSONObject c = oeuvres.getJSONObject(i);
                                 String titre = c.getString("Titre");
                         String date = c.getString("DateFinProduction");
@@ -268,7 +263,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                         db.getOeuvreDao().insertAll(oeuvre);
                     }
                     else{
-                        System.out.println("Already in bd");
+                        //System.out.println("Already in bd");
                     }
                     // adding contact to contact list
                 }

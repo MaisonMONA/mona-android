@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
@@ -42,15 +43,16 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    static int numOeuvre;
     TabLayout tabLayout;
-    ViewPager pager;
+    static ViewPager pager;
     //CustomViewPager pager;
-
+    public static boolean oeuvreDuJour;
     public final int nb = 4;
     private String TAG = MainActivity.class.getSimpleName();
     private ListView lv;
     ArrayList<OeuvreObject> oeuvreList; //liste d'oeuvre qui sera passée à chaque activité
+    static Permissions Permission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +62,12 @@ public class MainActivity extends AppCompatActivity {
         oeuvreList = bundle.getParcelableArrayList("List");
         if (oeuvreList==null) {
         */
-            new getOeuvre().execute();
-        //}
+        Permission = new Permissions(this);
 
+        new getOeuvre().execute();
+        //}
+        numOeuvre=0;
+        oeuvreDuJour=true;
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         pager = (ViewPager) findViewById(R.id.pager);
         //custom pager without swiping
@@ -77,7 +82,12 @@ public class MainActivity extends AppCompatActivity {
 
         pagerAdapter.setTabIcon();
     }
-
+    public static void listFrag(int position)
+    {
+        numOeuvre =position;
+        System.out.println("numOeuvre" +position);
+        pager.setCurrentItem(0);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -121,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 */
+
     public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
         List<Drawable> icons = new ArrayList<Drawable>();
         List<Drawable> iconsHilighted = new ArrayList<>();
@@ -153,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             Fragment fragment;
+            Bundle args = new Bundle();
             if (position == 0) {
                 fragment = new FicheFragment();
             } else if (position == 1){
@@ -160,16 +172,17 @@ public class MainActivity extends AppCompatActivity {
             } else if (position == 2){
                 fragment = new ListViewFragment();
             }
-            /*else {
+            else if(position == 3){
                 fragment = new GalleryFragment();
             }
-            */
+
             else {
                 fragment = new FicheFragment();
             }
-            Bundle args = new Bundle();
+
             args.putInt("id", position);
             args.putParcelableArrayList("List",oeuvreList);
+            args.putInt("numOeuvre", numOeuvre);
             fragment.setArguments(args);
             return fragment;
         }

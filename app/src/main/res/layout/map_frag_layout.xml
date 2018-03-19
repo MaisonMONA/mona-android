@@ -17,11 +17,6 @@
         <ImageButton
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:id="@+id/button_listView"
-            android:background="@mipmap/ic_listview" />
-        <ImageButton
-            android:layout_width="60dp"
-            android:layout_height="60dp"
             android:id="@+id/button_location"
             android:background="@mipmap/ic_map_person" />
 
