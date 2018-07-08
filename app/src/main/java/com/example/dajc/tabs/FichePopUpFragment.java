@@ -1,25 +1,31 @@
 package com.example.dajc.tabs;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
+import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -46,14 +52,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import static java.lang.Integer.parseInt;
-
-/**
- * Created by DAJC on 2016-04-17.
- */
-public class
-FicheFragment extends Fragment implements View.OnClickListener {
-
+public class FichePopUpFragment extends DialogFragment implements View.OnClickListener{
     static final int REQUEST_IMAGE_PICTURE = 1;
     OeuvreObject object;
     int numOeuvre;
@@ -68,6 +67,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
     ImageButton fav_b;
     ImageButton map_b;
     ImageButton cam_b;
+    ImageButton close;
     String lastUpdate;
     EditText userC;
     RatingBar ratingBar;
@@ -93,44 +93,13 @@ FicheFragment extends Fragment implements View.OnClickListener {
     ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
-    int idDuJour;
 
     SharedPreferences changes;
-
-
-
-    public FicheFragment (){
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("Onceate");
-        Calendar calendar = Calendar.getInstance();
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        Random rand = new Random(dayOfYear);
-        int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
-        numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
-        oeuvreList = FirstActivity.getOeuvreList();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View v;
-        if(oeuvreList.get(idDuJour).getURI().equals("")){
-            v = inflater.inflate(R.layout.fiche_noimg, container, false);
-            fav_b = (ImageButton) v.findViewById(R.id.button_fav);
-            fav_b.setOnClickListener(this);
-            map = (MapView) v.findViewById(R.id.map);
-            map.setTileSource(TileSourceFactory.MAPNIK);
-
-            //set default zoom buttons and ability to zoom with fingers
-            map.setBuiltInZoomControls(false);
-            map.setMultiTouchControls(true);
-
-            //set map default view point
-            mapController = map.getController();
-            mapController.setZoom(15);
-
-        }
-        else{
-            v = inflater.inflate(R.layout.fiche_img, container, false);
+        if (MainActivity.withImg==true) {
+            v = inflater.inflate(R.layout.fiche_popup, container, true);
             photo = (ImageView) v.findViewById(R.id.photo);
             date_ajout = (TextView) v.findViewById(R.id.tv_date);
             userC = (EditText) v.findViewById(R.id.user_comment);
@@ -174,14 +143,59 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
             });
         }
+        else {
+            v = inflater.inflate(R.layout.fiche_popup_noimg, container, true);
+            fav_b = (ImageButton) v.findViewById(R.id.button_fav);
+            fav_b.setOnClickListener(this);
+            map = (MapView) v.findViewById(R.id.map);
+            map.setTileSource(TileSourceFactory.MAPNIK);
+
+            //set default zoom buttons and ability to zoom with fingers
+            map.setBuiltInZoomControls(false);
+            map.setMultiTouchControls(true);
+
+            //set map default view point
+            mapController = map.getController();
+            mapController.setZoom(15);
+        }
+        oeuvreList = FirstActivity.getOeuvreList();
+        numOeuvre = MainActivity.numOeuvre;
+        System.out.println("OnCreateView");
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
         date = (TextView) v.findViewById(R.id.date);
         infos = (TextView) v.findViewById(R.id.info);
         map_b = (ImageButton) v.findViewById(R.id.button_map);
         cam_b = (ImageButton) v.findViewById(R.id.button_cam);
+        close = (ImageButton) v.findViewById(R.id.closebtn);
+        //System.out.println(oeuvreList.get(2).getTitre());
+        close.setOnClickListener(this);
         cam_b.setOnClickListener(this);
         map_b.setOnClickListener(this);
+        /*MainActivity.onSwipeTouchListener=new OnSwipeTouchListener(getActivity()) {
+            public void onSwipeTop() {
+                Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();
+            }
+            public void onSwipeRight() {
+                MainActivity.numOeuvre+=1;
+                ListViewFragment frag = (ListViewFragment) getTargetFragment();
+                if(frag != null){
+                    frag.refreshDialog();
+                }
+            }
+            public void onSwipeLeft() {
+                MainActivity.numOeuvre+=-1;
+                ListViewFragment frag = (ListViewFragment) getTargetFragment();
+                if(frag != null){
+                    frag.refreshDialog();
+                }
+            }
+            public void onSwipeBottom() {
+                Toast.makeText(getActivity(), "bottom", Toast.LENGTH_SHORT).show();
+            }
+
+        };
+        v.setOnTouchListener(new OnSwipeTouchListener(getActivity()));*/
         new getOeuvre().execute();
         return v;
     }
@@ -189,15 +203,25 @@ FicheFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        new getOeuvre().execute();
-        Log.d("settings", " today = " + idDuJour);
     }
+
+    @Override
+    public void onResume()
+    {
+        ViewGroup.LayoutParams params = getDialog().getWindow().getAttributes();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+        super.onResume();
+
+    }
+
     public void finishUI(){
+        //image de l'oeuvre ou par défaut
         if (uri_photo.equals("")) {
             //Picasso.with(getContext()).load(uri_photo).resize(500, 888).into(photo);
             //photo.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             Bitmap bmImg = BitmapFactory.decodeFile(uri_photo);
             System.out.println("uri "+ uri_photo);
             System.out.println("etat "+ object.getEtat());
@@ -240,6 +264,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     public void loadFiche() {
         //get content for the Fiche
         titre_o = object.getTitre();
@@ -269,7 +294,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 +  "Technique: " + tech_oeuvre + "\n"
                 + "Matériau: " + mat_oeuvre;
         infos.setText(information);
-        if(object.getURI().equals("")){
+        if(MainActivity.withImg==false){
             ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
             String idItem = object.getId();
             double art_lati = object.getLocationX();
@@ -303,21 +328,15 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
 
     }
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Bundle extras = data.getExtras();
+        Bitmap imageBitmap = (Bitmap)extras.get("data");
         System.out.println(requestCode == REQUEST_IMAGE_PICTURE && resultCode !=0);
         if(requestCode == REQUEST_IMAGE_PICTURE && resultCode !=0){
-
-            Bundle extras = data.getExtras();
-            //oeuvreList = FirstActivity.oeuvreList;
-            Bitmap imageBitmap = (Bitmap)extras.get("data");
-            //new getOeuvre().execute();
-            /*if(imageBitmap != null) {
-                photo.setImageBitmap(imageBitmap);
-            }
-*/
 
             File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             try {
@@ -342,28 +361,30 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 object.setURI(currentPath);
                 object.setEtat(2);
                 new updateOeuvre().execute(object);
+                MainActivity.withImg=true;
+                if(MainActivity.caller.equals("List")){
+                ListViewFragment frag = (ListViewFragment) getTargetFragment();
+                if(frag != null){
+                    frag.refreshDialog();
+                }}
+                else if(MainActivity.caller.equals("Map")){
+                    MapFragment frag = (MapFragment) getTargetFragment();
+                    if(frag != null){
+                        frag.refreshDialog();
+                    }}
+                else if(MainActivity.caller.equals("Gallery")){
+                    GalleryFragment frag = (GalleryFragment) getTargetFragment();
+                    if(frag != null){
+                        frag.refreshDialog();
+                    }}
+            //new getOeuvre().execute();
                 /*Intent refresh = new Intent(getContext(), MainActivity.class);
                 startActivity(refresh);//Start the same Activity
                 getActivity().finish();*/
                 /*MainActivity.oeuvreDuJour=false;
-                /*Fragment currentFragment = getFragmentManager().findFragmentByTag("FicheFragment");
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.detach(currentFragment);
-                fragmentTransaction.attach(currentFragment);
-                fragmentTransaction.commit();*/
-                /*FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.detach(this).attach(new FicheFragment()).commit();*/
-                FragmentManager fm = getFragmentManager();
-
-                if (fm != null) {
-                    // Perform the FragmentTransaction to load in the list tab content.
-                    // Using FragmentTransaction#replace will destroy any Fragments
-                    // currently inside R.id.fragment_content and add the new Fragment
-                    // in its place.
-                    FragmentTransaction ft = fm.beginTransaction();
-                    ft.replace(R.id.pager, new FicheFragment());
-                    ft.commit();
-                }
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.detach(this).attach(this).commit();*/
+                this.dismiss();
 
 
             } catch (IOException e) {
@@ -406,12 +427,13 @@ FicheFragment extends Fragment implements View.OnClickListener {
 */
                 break;
             case R.id.button_map:
-
-                /*intent = new Intent(getActivity(), MapActivity.class);
+/*
+                intent = new Intent(getActivity(), MapActivity.class);
                 intent.putExtra("numOeuvre", numOeuvre);
                 intent.putExtra("List", oeuvreList);
                 startActivity(intent);*/
                 MainActivity.MapFrag(0);
+                this.dismiss();
                 break;
 
             case R.id.button_cam:
@@ -439,9 +461,8 @@ FicheFragment extends Fragment implements View.OnClickListener {
                                     mediaStorageDir
                             );
                             //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mediaFile));*/
-                            MainActivity.oeuvreDuJour=false;
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
-                            break;
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
+                        break;
                          /*catch (IOException e) {
                             e.printStackTrace();
                         }*/
@@ -463,6 +484,9 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getActivity(),
                         String.valueOf(ratingBar.getRating()),
                         Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.closebtn:
+                this.dismiss();
         }
 
     }
@@ -470,29 +494,99 @@ FicheFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+/*if (MainActivity.withImg==true) {
+    Boolean changesComment;
+    Boolean changesRating;
 
+    changesComment = changes.getBoolean("comment", false);
+    changesRating = changes.getBoolean("rating", false);
+
+    if (changesComment == true) {
+        String comment = String.valueOf(userC.getText());
+        object.setCommentaire(comment);
+
+        SharedPreferences.Editor editor = changes.edit();
+        editor.putBoolean("comment", false);
+        editor.commit();
+    }
+
+    if (changesRating == true) {
+        int rating = (int) ratingBar.getRating();
+
+        object.setNote(rating);
+        SharedPreferences.Editor editor = changes.edit();
+        editor.putBoolean("rating", false);
+        editor.commit();
+    }
+}*/
     }
 
     @Override
     public void onPause() {
         super.onPause();
+       /* if (MainActivity.withImg==true) {
+            Boolean changesComment;
+            Boolean changesRating;
 
+            changesComment = changes.getBoolean("comment", false);
+            changesRating = changes.getBoolean("rating", false);
+
+            if (changesComment == true) {
+                String comment = String.valueOf(userC.getText());
+                object.setCommentaire(comment);
+
+                SharedPreferences.Editor editor = changes.edit();
+                editor.putBoolean("comment", false);
+                editor.commit();
+            }
+
+            if (changesRating == true) {
+                int rating = (int) ratingBar.getRating();
+
+                object.setNote(rating);
+                SharedPreferences.Editor editor = changes.edit();
+                editor.putBoolean("rating", false);
+                editor.commit();
+            }
+        }*/
     }
 
     @Override
     public void onStop() {
         super.onStop();
+       /* if (MainActivity.withImg==true) {
+            Boolean changesComment;
+            Boolean changesRating;
 
+            changesComment = changes.getBoolean("comment", false);
+            changesRating = changes.getBoolean("rating", false);
+
+            if (changesComment == true) {
+                String comment = String.valueOf(userC.getText());
+                object.setCommentaire(comment);
+
+                SharedPreferences.Editor editor = changes.edit();
+                editor.putBoolean("comment", false);
+                editor.commit();
+            }
+
+            if (changesRating == true) {
+                int rating = (int) ratingBar.getRating();
+
+                object.setNote(rating);
+                SharedPreferences.Editor editor = changes.edit();
+                editor.putBoolean("rating", false);
+                editor.commit();
+            }
+        }*/
     }
     public class getOeuvre extends AsyncTask<Void, Void, Void> {
 
 
         @Override
         protected Void doInBackground(Void... voids) {
-            System.out.println("Isnt null anymore"+ numOeuvre);
             oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
             object=oeuvreList.get(0);
-            System.out.println("ID object = " + object.getId());
             return null;
         }
 

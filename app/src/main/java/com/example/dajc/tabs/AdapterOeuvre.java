@@ -1,6 +1,7 @@
 package com.example.dajc.tabs;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,38 @@ public class AdapterOeuvre extends ArrayAdapter<OeuvreObject> {
             //System.out.println(item.getTitre());
             header.setText(item.getTitre());
             //description.setText(item.getArtiste().getNom());
-            description.setText(item.getArtiste());
+            if (MainActivity.triType==0) {
+                Location locObjet = new Location("");
+                locObjet.setLatitude(item.getLocationX());
+                locObjet.setLongitude(item.getLocationY());
+                Location locUser = new Location("");
+                locUser.setLatitude(MainActivity.lati);
+                locUser.setLongitude(MainActivity.longi);
+                float distanceInMeters = locUser.distanceTo(locObjet);
+                System.out.println(locObjet.getLongitude());
+                System.out.println(locObjet.getLatitude());
+                System.out.println(locUser.getLongitude());
+                System.out.println(locUser.getLatitude());
+                System.out.println((int) distanceInMeters);
+                int dMeter=(int) distanceInMeters;
+                double dKm=(double)dMeter/1000;
+                dKm = Math.round(dKm * 10);
+                dKm = dKm/10;
+                if((int) distanceInMeters>999){
+                    description.setText(String.valueOf(dKm)+"km");
+                }
+                else{
+                    description.setText(String.valueOf(dMeter)+"m");
+                }
+            }
+            else if (MainActivity.triType==1){
+                description.setText(item.getQuartier());}
+            else if (MainActivity.triType==2){
+                description.setText(item.getArtiste());}
+            else if (MainActivity.triType==3){
+                description.setText(item.getArtiste());}
+
+
 
             return v;
         } catch (Exception ex) {

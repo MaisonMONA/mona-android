@@ -26,172 +26,28 @@ import java.util.List;
  * Created by LenaMK on 01/07/2016.
  */
 public class PhotoActivity extends Activity {
-    String title;
-    String author;
-    String date_ajout;
     String uri_photo;
-    String user_c;
     int numOeuvre;
-    int user_r;
-    AppDatabase db;
-    TextView p_title;
-    TextView p_author;
-    TextView p_date_ajout;
-    EditText p_user_c;
     ImageView photo;
-    RatingBar p_rating;
     SharedPreferences changes;
     OeuvreObject oeuvre;
     List<OeuvreObject> list;
 
     public PhotoActivity() {
-        // this.dbh = FirstActivity.getDBH();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        Bundle bundle= getIntent().getExtras();
+        numOeuvre=bundle.getInt("numOeuvre",0);
+        System.out.println("PhotoActivity Called");
         setContentView(R.layout.photo);
-        p_title = (TextView) findViewById(R.id.photo_titre);
-        p_author = (TextView) findViewById(R.id.photo_artiste);
-        p_date_ajout = (TextView) findViewById(R.id.photo_dateAjout);
-        p_user_c = (EditText) findViewById(R.id.photo_comment);
         photo = (ImageView) findViewById(R.id.photo_view);
-        p_rating = (RatingBar) findViewById(R.id.ratingBar);
 
-        Intent intent = getIntent();
-        numOeuvre = intent.getIntExtra("numOeuvre", 0);
         new getOeuvre().execute();
         //récupère les données dans c;
         changes = getApplicationContext().getSharedPreferences("change_rating", Context.MODE_PRIVATE);
-
-        p_rating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            public void onRatingChanged(RatingBar ratingBar, float rating,
-                                        boolean fromUser) {
-                SharedPreferences.Editor editor = changes.edit();
-                editor.putBoolean("rating", true);
-                editor.commit();
-            }
-        });
-
-        p_user_c.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                SharedPreferences.Editor editor = changes.edit();
-                editor.putBoolean("comment", true);
-                editor.commit();
-            }
-        });
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        Boolean changesComment;
-        Boolean changesRating;
-
-        changesComment = changes.getBoolean("comment", false);
-        changesRating = changes.getBoolean("rating", false);
-
-        if (changesComment) {
-            String comment = String.valueOf(p_user_c.getText());
-
-            //add modified value to DB
-            oeuvre.setCommentaire(comment);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("comment", false);
-            editor.commit();
-        }
-
-        if (changesRating) {
-            int rating = (int) p_rating.getRating();
-            //add modified value to DB
-            oeuvre.setNote(rating);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("rating", false);
-            editor.commit();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        Boolean changesComment;
-        Boolean changesRating;
-
-        changesComment = changes.getBoolean("comment", false);
-        changesRating = changes.getBoolean("rating", false);
-
-        if (changesComment) {
-            String comment = String.valueOf(p_user_c.getText());
-
-            //add modified value to DB
-            oeuvre.setCommentaire(comment);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("comment", false);
-            editor.commit();
-        }
-
-        if (changesRating) {
-            int rating = (int) p_rating.getRating();
-            //add modified value to DB
-            oeuvre.setNote(rating);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("rating", false);
-            editor.commit();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        Boolean changesComment;
-        Boolean changesRating;
-
-        changesComment = changes.getBoolean("comment", false);
-        changesRating = changes.getBoolean("rating", false);
-
-        if (changesComment) {
-            String comment = String.valueOf(p_user_c.getText());
-
-            //add modified value to DB
-            oeuvre.setCommentaire(comment);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("comment", false);
-            editor.commit();
-        }
-
-        if (changesRating) {
-            int rating = (int) p_rating.getRating();
-            //add modified value to DB
-            oeuvre.setNote(rating);
-            new updateOeuvre().execute(oeuvre);
-            SharedPreferences.Editor editor = changes.edit();
-            editor.putBoolean("rating", false);
-            editor.commit();
-        }
     }
 
 
@@ -206,29 +62,19 @@ public class PhotoActivity extends Activity {
     }
 
 
-    private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
+    private class getOeuvre extends AsyncTask<Void, Void, Void> {
 
 
         @Override
-        protected ArrayList<OeuvreObject> doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             list = FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre));
             oeuvre = list.get(0);
-            title = oeuvre.getTitre();
             uri_photo = oeuvre.getURI();
-            date_ajout = oeuvre.getDatedePhoto();
-            user_c = oeuvre.getCommentaire();
-            user_r = oeuvre.getNote();
-            p_title.setText(title);
-            author = oeuvre.getArtiste();
-            p_author.setText(author);
-            //date de la photo
-            p_date_ajout.setText(date_ajout);
-            //image de l'oeuvre ou par défaut
-
-            p_user_c.setText(user_c);
-            p_rating.setRating((float) user_r);
-
-            return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
+            return null;
         }
-
-    }}
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            treatPhoto();
+        }
+    }
+}

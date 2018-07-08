@@ -27,7 +27,8 @@ public interface OeuvreDao {
     // Gets all people in the database
     @Query("SELECT * FROM oeuvre")
     List<OeuvreObject> getAllOeuvre();
-
+    @Query("SELECT * FROM oeuvre WHERE Etat=1")
+    List<OeuvreObject> getFavOeuvre();
     @Query("SELECT * FROM oeuvre WHERE :ID = Id ")
     List<OeuvreObject> verifyID (String ID);
     // Gets all people in the database with a favorite color

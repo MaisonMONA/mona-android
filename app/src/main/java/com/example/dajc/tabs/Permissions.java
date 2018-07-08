@@ -21,7 +21,9 @@ public class Permissions {
     public Permissions(Activity activity) {
         this.activity = activity;
     }
-
+    public boolean checkPermAll(){
+        return (checkPermissionForLocationCoarse()&&checkPermissionForLocation()&&checkPermissionForCamera()&&checkPermissionForExternalStorage());
+    }
     public boolean checkPermissionForLocation(){
         int result = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
         if (result == PackageManager.PERMISSION_GRANTED){
@@ -58,12 +60,15 @@ public class Permissions {
             return false;
         }
     }
+    public void requestAll(){
+        ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA},LOCATION_PERMISSION_REQUEST_CODE);
 
+    }
     public void requestPermissionForLocation(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)){
             Toast.makeText(activity, "Microphone permission needed for location. Please allow in App Settings for additional functionality.", Toast.LENGTH_LONG).show();
         } else {
-            ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
     public void requestPermissionForLocationC(){

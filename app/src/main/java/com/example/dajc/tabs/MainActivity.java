@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -44,8 +45,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static int numOeuvre;
+    static int triType;
+    //to know which layout to use for Fiche
+    static boolean withImg;
     TabLayout tabLayout;
-    static ViewPager pager;
+    static double lati;
+    static double longi;
+    static String caller;
+    static NonSwipeableViewPager pager;
+    static PagerAdapter pagerAdapter;
     //CustomViewPager pager;
     public static boolean oeuvreDuJour;
     public final int nb = 4;
@@ -53,39 +61,47 @@ public class MainActivity extends AppCompatActivity {
     private ListView lv;
     ArrayList<OeuvreObject> oeuvreList; //liste d'oeuvre qui sera passée à chaque activité
     static Permissions Permission;
+    static OnSwipeTouchListener onSwipeTouchListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*Bundle bundle = getIntent().getExtras();
-        oeuvreList = bundle.getParcelableArrayList("List");
-        if (oeuvreList==null) {
-        */
-        Permission = new Permissions(this);
-
-        new getOeuvre().execute();
-        //}
-        numOeuvre=0;
         oeuvreDuJour=true;
+        caller="";
+        lati=45.508567;;
+        longi=-73.566455;
+        triType=0;
+        Permission = new Permissions(this);
+        if (Permission.checkPermAll()==false)
+        {
+            Permission.requestAll();
+        }
+        new getOeuvre().execute();
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        pager = (ViewPager) findViewById(R.id.pager);
+        //pager = (ViewPager) findViewById(R.id.pager);
         //custom pager without swiping
-        //pager = (CustomViewPager)findViewById(R.id.pager);
+        pager = findViewById(R.id.pager);
         //pager.setPagingEnabled(false);
 
 
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-
         tabLayout.setupWithViewPager(pager);
-
         pagerAdapter.setTabIcon();
+    }
+    public static void MapFrag(int position)
+    {
+        pager.setCurrentItem(1);
     }
     public static void listFrag(int position)
     {
         numOeuvre =position;
         System.out.println("numOeuvre" +position);
+        if (pager.getAdapter() != null)
+            pager.setAdapter(null);
+        pager.setAdapter(pagerAdapter);
+
         pager.setCurrentItem(0);
     }
     @Override
@@ -107,30 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-/*
-    public class NonSwipeableViewPager extends ViewPager {
-
-        public NonSwipeableViewPager(Context context) {
-            super(context);
-        }
-
-        public NonSwipeableViewPager(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(MotionEvent event) {
-            // Never allow swiping to switch between pages
-            return false;
-        }
-
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            // Never allow swiping to switch between pages
-            return false;
-        }
-    }
-*/
 
     public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
         List<Drawable> icons = new ArrayList<Drawable>();
@@ -140,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         public PagerAdapter(FragmentManager fm) {
             super(fm);
             pager.addOnPageChangeListener(this);
-
+/*
             Drawable icon1 =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             Drawable icon1Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_home_active);
             Drawable icon2 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_passive);
@@ -158,14 +150,16 @@ public class MainActivity extends AppCompatActivity {
             iconsHilighted.add(icon1Hilighted);
             iconsHilighted.add(icon2Hilighted);
             iconsHilighted.add(icon3Hilighted);
-            iconsHilighted.add(icon4Hilighted);
+            iconsHilighted.add(icon4Hilighted);*/
         }
+
 
         @Override
         public Fragment getItem(int position) {
             Fragment fragment;
             Bundle args = new Bundle();
             if (position == 0) {
+                System.out.println("Called for it");
                 fragment = new FicheFragment();
             } else if (position == 1){
                 fragment = new MapFragment();
@@ -193,29 +187,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
- /*       public CharSequence getPageTitle(int position) {
+        public CharSequence getPageTitle(int position) {
             String titre;
             if (position == 0) {
                 titre = "Oeuvre du jour";
 
-
             } else if (position == 1) {
-                titre = "Plan";
+                titre = "Carte";
             } else if (position == 2) {
-                titre = "Favoris";
+                titre = "Liste";
             } else {
                 titre = "Galerie";
             }
 
             return titre;
         }
-*/
-        public CharSequence getPageTitle(int position) {
+
+        /*public CharSequence getPageTitle(int position) {
             return null;
         }
-
+*/
         public void setTabIcon() {
-            for(int i = 0; i < icons.size(); i++) {
+            /*for(int i = 0; i < icons.size(); i++) {
                 if(i == 0) {
                     //noinspection ConstantConditions
                     tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
@@ -224,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                     //noinspection ConstantConditions
                     tabLayout.getTabAt(i).setIcon(icons.get(i));
                 }
-            }
+            }*/
         }
 
         @Override
@@ -237,11 +230,11 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < getCount(); i++) {
                 if(i == position) {
                     //noinspection ConstantConditions
-                    tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
+                   // tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
                 }
                 else {
                     //noinspection ConstantConditions
-                    tabLayout.getTabAt(i).setIcon(icons.get(i));
+                  //  tabLayout.getTabAt(i).setIcon(icons.get(i));
                 }
             }
 
@@ -252,7 +245,14 @@ public class MainActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
     }
-
+    public void reload() {
+        Intent intent = getIntent();
+        overridePendingTransition(0, 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(intent);
+    }
     public class CustomViewPager extends android.support.v4.view.ViewPager{
         private boolean enabled;
 

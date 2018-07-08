@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -20,10 +21,10 @@ import java.util.ArrayList;
  */
 public class GalleryFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    ListView lv;
+    GridView lv;
     public static GalleryAdaptor sca;
-    ArrayList<OeuvreObject> oeuvreList;
-
+    public static ArrayList<OeuvreObject> oeuvreList;
+    FichePopUpFragment dialogFragment;
     public GalleryFragment() {
         // this.dbh =  FirstActivity.getDBH();
 
@@ -32,11 +33,11 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.listview, container, false);
+        View v = inflater.inflate(R.layout.gallery_frag, container, false);
 
-        lv = (ListView) v.findViewById(R.id.listView);
+        lv = (GridView) v.findViewById(R.id.gridview);
 
-        sca = new GalleryAdaptor(getContext(), android.R.layout.simple_list_item_2);
+        sca = new GalleryAdaptor(getContext(),R.layout.gallery_item);
 
         lv.setAdapter(sca);
 
@@ -47,8 +48,31 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        MainActivity.oeuvreDuJour=false;
-        MainActivity.listFrag((Integer.parseInt(oeuvreList.get(position).getId())));
+        /*MainActivity.oeuvreDuJour=false;
+        MainActivity.listFrag((Integer.parseInt(oeuvreList.get(position).getId())));*/
+        MainActivity.numOeuvre= Integer.parseInt(oeuvreList.get(position).getId());
+        if(oeuvreList.get(position).getEtat()==2){
+            MainActivity.withImg=true;
+        }
+        else{
+            MainActivity.withImg=false;
+        }
+        MainActivity.caller="Gallery";
+        dialogFragment = new FichePopUpFragment ();
+        dialogFragment.setTargetFragment(GalleryFragment.this, 1337);
+        dialogFragment.show(getActivity().getSupportFragmentManager(),"simple dialog");
+    }
+    public void refreshDialog(){
+        //en prevision du swipe
+        /*if(oeuvreList.get(MainActivity.numOeuvre).getEtat()==2){
+            MainActivity.withImg=true;
+        }
+        else{
+            MainActivity.withImg=false;
+        }*/
+        dialogFragment = new FichePopUpFragment ();
+        dialogFragment.setTargetFragment(GalleryFragment.this, 1337);
+        dialogFragment.show(getActivity().getSupportFragmentManager(),"simple dialog");
     }
 
     private class getGalleryOeuvre extends AsyncTask<Void, Void, Void> {
@@ -63,6 +87,7 @@ public class GalleryFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            sca.clear();
             sca.addAll(oeuvreList);
         }
     }

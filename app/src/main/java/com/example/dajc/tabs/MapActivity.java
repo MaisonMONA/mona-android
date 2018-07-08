@@ -113,7 +113,7 @@ public class MapActivity extends Activity implements LocationListener {
             @Override
             public boolean onItemLongPress(int index, OverlayItem item) {
                 //shows the name of the artwork
-                //should work on getting the fiche
+                //should work on getting the fiche_noimg
 
                 Toast.makeText(getApplicationContext(), item.getSnippet(), Toast.LENGTH_SHORT).show();
 

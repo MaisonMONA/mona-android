@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -67,7 +65,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fiche);
+        setContentView(R.layout.fiche_noimg);
         Bundle bundle = getIntent().getExtras();
         oeuvreList = bundle.getParcelableArrayList("List");
         title = (TextView) findViewById(R.id.titre);
@@ -288,10 +286,11 @@ public class FicheActivity extends Activity implements View.OnClickListener {
 
                 break;
             case R.id.button_map:
-
+/*
                 intent = new Intent(this, MapActivity.class);
                 intent.putExtra("numOeuvre", numOeuvre);
-                startActivity(intent);
+                startActivity(intent);*/
+                MainActivity.MapFrag(0);
 
                 break;
 

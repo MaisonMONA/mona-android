@@ -25,8 +25,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static android.content.ContentValues.TAG;
 
@@ -39,10 +46,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         return oeuvreList;
     }
 
-    /**
-    Button info;
-    Button launch;
-**/ static ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
+    static ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
     public static AppDatabase db;
     public static AppDatabase getDb(){return db;}
     @Override
@@ -50,7 +54,6 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.first_activity);
-
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "oeuvre-database").build();
 
@@ -68,10 +71,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
             {*/
                 System.out.println("No network");
-                createList(getFile());
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra("List", oeuvreList);
-                startActivity(intent);
+                new GetOeuvres().execute();
 /*
             }
             else{
@@ -83,45 +83,32 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(oeuvreList.size()>0){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        }
+
+    }
+
     private class GetOeuvres extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(getApplicationContext(),"Json Data is downloading",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Loading data",Toast.LENGTH_LONG).show();
 
         }
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
-            String jsonStr = sh.makeServiceCall(url);
 
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                createList(jsonStr);
 
-                try {
-                    Writer output = null;
-                    File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
-                    output = new BufferedWriter(new FileWriter(file));
-                    output.write(jsonStr);
-                    output.close();
-                } catch (Exception e) {
-                    Log.e(TAG, "File Saving error: " + e.getMessage());
-                }
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+                createList(null);
+
+
             return null;
         }
         @Override
@@ -135,7 +122,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(getApplicationContext(),"Json Data is downloading",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Loading",Toast.LENGTH_LONG).show();
 
         }
 
@@ -143,13 +130,52 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
             // Making a request to url and getting response
-            String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
-            String jsonStr = sh.makeServiceCall(url);
+            //String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
+            //String url ="www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson";
+            //String jsonStr = sh.makeServiceCall(url);
+            StringBuilder result = new StringBuilder();
+            URL url = null;
+            try {
+                url = new URL("http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson1");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                conn.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            BufferedReader rd = null;
+            try {
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String line;
+            try {
+                while ((line = rd.readLine()) != null) {
+                    result.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                rd.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String jsonStr = result.toString();
 
             Log.e(TAG, "Response from url: " + jsonStr);
             if (jsonStr != null) {
                 createList(jsonStr);
-
+/*
                 try {
                     Writer output = null;
                     File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
@@ -158,7 +184,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                     output.close();
                 } catch (Exception e) {
                     Log.e(TAG, "File Saving error: " + e.getMessage());
-                }
+                }*/
             } else {
                 Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
@@ -178,14 +204,25 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("List", oeuvreList);
             startActivity(intent);
+            /*String param = "?Authorization=" + "allo";
+            System.out.println("J<ao communnique au serveur");
+            URL obj = null;
+            try {
+                obj = new URL( "http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=addComment&IDOeuvre=1&comment=test3&username=AndroidTesteur&password=1111");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection conn;
+            try {
+                 conn = (HttpURLConnection) obj.openConnection();
+                conn.setRequestMethod("GET");
+                BufferedReader rd = null;
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
         }
-    }
-    public boolean fileExist(String fname){
-/*
-        File file = getBaseContext().getFileStreamPath(fname);
-        return file.exists();
-        */
-        return false;
     }
 
     private boolean isNetworkAvailable() {
@@ -193,36 +230,10 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-    private String getFile()
-    {
-//Get the text file
-        File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
-
-//Read text from file
-        StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
-            }
-            System.out.println(text+ "ok");
-            br.close();
-        }
-        catch (IOException e) {
-            Log.e(TAG, "Couldn't get data from file.");//You'll need to add proper error handling here
-            System.out.println("Failed");
-        }
-
-        return text.toString();
-    }
 
     protected void createList(String jsonStr) {
+        oeuvreList.clear();
         if (jsonStr != null) {
-            oeuvreList.clear();
             try {
                 // Getting JSON Array node
                 JSONArray oeuvres = new JSONArray(jsonStr);
@@ -230,35 +241,82 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
                 // looping through All Contacts
                 for (int i = 0; i < oeuvres.length(); i++) {
-
-                    String id= String.valueOf(i);
+                    JSONObject c = oeuvres.getJSONObject(i);
+                    String id =c.getString("id");
                     if (db.getOeuvreDao().verifyID(id).isEmpty()) {
                         //System.out.println("not in bd");
-                        JSONObject c = oeuvres.getJSONObject(i);
-                                String titre = c.getString("Titre");
-                        String date = c.getString("DateFinProduction");
-                        String materiaux = c.getString("Materiaux");
-                        //String id =c.getString("id");
+                        String titre = c.getString("Titre");
+                        if (titre.equals("null")&&Integer.parseInt(id)>999){
+                            titre= "Non Titré (murale peinte)";
+                        }
+                        else if(titre.equals("null")){
+                            titre= "Non Titré";
+                        }
+                        String date = c.getString("Date");
+                        if (date.equals("null")||date.equals(""))
+                        {
+                            date="Date inconnue";
+                        }
+                        else {
+                            date = treatDate(date);
+                        }
+                        //Calendar date = ((Calendar) c.getDouble("DateFinProduction"));
+                        String materiaux  = c.getString("Materiaux");
+                        if (!materiaux .equals("null")){
+                        JSONArray materiauxArray = c.getJSONArray("Materiaux");
+                        materiaux = treatTechnique(materiauxArray);}
+                        else{
+                            materiaux="";
+                        }
+                        /*if (materiaux.equals("")){
+                            JSONArray techniqueArray = c.getJSONArray("Technique");
+                            materiaux = treatTechnique(techniqueArray);}*/
                         //Rajouter le colet quartier dans le fichier JSON
                         String quartier = c.getString("Arrondissement");
-                        String dimension = c.getString("DimensionsGenerales");
+                        String dimension = c.getString("Dimension");
+                        if (dimension.equals("null")){
+                            dimension="";
+                        }
                         String technique = c.getString("Technique");
-                        JSONArray artisteArray = c.getJSONArray("Artistes");
+                        if (!technique.equals("null")){
+                        JSONArray techniqueArray = c.getJSONArray("Technique");
+                        technique = treatTechnique(techniqueArray);}
+                        else{
+                            technique="";
+                        }
+                        JSONArray artisteArray = c.getJSONArray("Artiste");
                         JSONObject artisteinfo = artisteArray.getJSONObject(0);
                         String artiste_nom = artisteinfo.getString("Nom");
-                        String artiste_id = artisteinfo.getString("Prenom");
-                        String artiste_prenom = artisteinfo.getString("NoInterne");
+                        String artiste_id = artisteinfo.getString("ID");
+                        String artiste_prenom = artisteinfo.getString("Prenom");
                         String artiste_collectif = artisteinfo.getString("NomCollectif");
-                        double locX = c.getDouble("CoordonneeLatitude");
-                        double locY = c.getDouble("CoordonneeLongitude");
+                        double locX = c.getDouble("Latitude");
+                        double locY = c.getDouble("Longitude");
                         ArtisteObject artiste;
+                        OeuvreObject oeuvre;
                         if (artiste_collectif.equals("null")) {
                             artiste = new ArtisteObject(artiste_nom, artiste_prenom, artiste_id, false);
+                            if (artiste_nom.equals("null")&&artiste_prenom.equals("null"))
+                            {
+                                oeuvre = new OeuvreObject(titre, id, "Artiste inconnu", date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                            }
+                            else if (artiste_nom.equals("null")){
+                                oeuvre = new OeuvreObject(titre, id, artiste_prenom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+
+                            }
+                            else if (artiste_prenom.equals("null")){
+                                oeuvre = new OeuvreObject(titre, id, artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+
+                            }
+                            else {
+                                oeuvre = new OeuvreObject(titre, id, artiste_prenom + " " + artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                            }
                         } else {
                             artiste = new ArtisteObject(artiste_collectif, artiste_prenom, artiste_id, true);
-                        }
+                                oeuvre = new OeuvreObject(titre, id, artiste_collectif, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
 
-                        OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                        }
+                        //OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste_prenom+ " "+artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
                         //artiste.addOeuvres(oeuvre);
                         db.getOeuvreDao().insertAll(oeuvre);
                     }
@@ -277,6 +335,48 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         else{
             oeuvreList.addAll(db.getOeuvreDao().getAllOeuvre());
         }
+    }
+    public String treatArtiste(JSONArray s) throws JSONException {
+        String list = "";
+        for(int i = 0 ; i < s.length() ; i++){
+            if (i<s.length()-1){
+                list+=s.getJSONObject(i).getString("Nom")+", ";
+            }
+            else {
+                list += s.getJSONObject(i).getString("Nom");
+            }
+        }
+        return list;
+    }
+    public String treatTechnique(JSONArray s) throws JSONException {
+            String list = "";
+            for(int i = 0 ; i < s.length() ; i++){
+                if (i<s.length()-1){
+                    list+=s.getJSONObject(i).getString("Nom")+", ";
+                }
+                else {
+                    list += s.getJSONObject(i).getString("Nom");
+                }
+            }
+            return list;
+    }
+    public String treatDate(String s)
+    {
+        if (!s.equals("null")) {
+            String[] temp = s.split("\\(");
+            s = temp[1];
+            temp = s.split("-");
+            long doub;
+            if (temp.length == 2) {
+                doub = Long.parseLong(temp[0]);
+            } else {
+                doub = Long.parseLong(temp[1]);
+                doub = doub * -1;
+            }
+            String date = new java.text.SimpleDateFormat("MM/dd/yyyy").format(new java.util.Date(doub));
+            return date;
+        }
+        return "erreur de date";
     }
 
 }

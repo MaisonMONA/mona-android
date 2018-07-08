@@ -34,22 +34,14 @@ public class GalleryAdaptor extends ArrayAdapter<OeuvreObject> {
         if (inView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            inView = inflater.inflate(R.layout.rangee_photo, null);
+            inView = inflater.inflate(R.layout.gallery_item, null);
         }
 
-        TextView tv_titre = (TextView)inView.findViewById(R.id.photoRangee_title);
-        TextView tv_sub = (TextView)inView.findViewById(R.id.photoRangee_subtitle);
-        OeuvreObject oeuvre = FirstActivity.getOeuvreList().get(pos);
-
-        String titre = oeuvre.getTitre();
-        String numOeuvre = oeuvre.getId();
+        OeuvreObject oeuvre = getItem(pos);
         String uri = oeuvre.getURI();
 
-        String date = oeuvre.getDatedePhoto();
-        tv_titre.setText(titre);
-        tv_sub.setText(date);
 
-        ImageView iv = (ImageView)inView.findViewById(R.id.photoRange_image);
+        ImageView iv = (ImageView)inView.findViewById(R.id.image);
         Bitmap bmImg = BitmapFactory.decodeFile(uri);
         iv.setImageBitmap(bmImg);
 
