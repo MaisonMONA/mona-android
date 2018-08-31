@@ -114,23 +114,14 @@ FicheFragment extends Fragment implements View.OnClickListener {
         oeuvreList = FirstActivity.getOeuvreList();
         View v;
         if(oeuvreList.get(idDuJour).getURI().equals("")){
-            v = inflater.inflate(R.layout.fiche_noimg, container, false);
+            v = inflater.inflate(R.layout.fiche_noimg2, container, false);
             fav_b = (ImageButton) v.findViewById(R.id.button_fav);
             fav_b.setOnClickListener(this);
-            map = (MapView) v.findViewById(R.id.map);
-            map.setTileSource(TileSourceFactory.MAPNIK);
 
-            //set default zoom buttons and ability to zoom with fingers
-            map.setBuiltInZoomControls(false);
-            map.setMultiTouchControls(true);
-
-            //set map default view point
-            mapController = map.getController();
-            mapController.setZoom(15);
 
         }
         else{
-            v = inflater.inflate(R.layout.fiche_img, container, false);
+            v = inflater.inflate(R.layout.fiche_img2, container, false);
             photo = (ImageView) v.findViewById(R.id.photo);
             date_ajout = (TextView) v.findViewById(R.id.tv_date);
             userC = (EditText) v.findViewById(R.id.user_comment);
@@ -174,6 +165,16 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
             });
         }
+        map = (MapView) v.findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+
+        //set default zoom buttons and ability to zoom with fingers
+        map.setBuiltInZoomControls(false);
+        map.setMultiTouchControls(true);
+
+        //set map default view point
+        mapController = map.getController();
+        mapController.setZoom(15);
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
         date = (TextView) v.findViewById(R.id.date);

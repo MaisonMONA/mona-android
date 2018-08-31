@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -45,8 +46,11 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     public static ArrayList<OeuvreObject> getOeuvreList() {
         return oeuvreList;
     }
-
     static ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
+    public static ArrayList<BadgeObject> getBadgeList() {
+        return badgeList;
+    }
+    static ArrayList<BadgeObject> badgeList = new ArrayList<BadgeObject>();
     public static AppDatabase db;
     public static AppDatabase getDb(){return db;}
     @Override
@@ -107,6 +111,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
 
                 createList(null);
+                createBadges();
 
 
             return null;
@@ -122,7 +127,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(getApplicationContext(),"Loading",Toast.LENGTH_LONG).show();
+           Toast.makeText(getApplicationContext(),"Loading",Toast.LENGTH_LONG).show();
 
         }
 
@@ -175,6 +180,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             Log.e(TAG, "Response from url: " + jsonStr);
             if (jsonStr != null) {
                 createList(jsonStr);
+                createBadges();
 /*
                 try {
                     Writer output = null;
@@ -231,6 +237,14 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    protected void createBadges(){
+        badgeList = BadgeObject.getBadges();
+        for (final BadgeObject badge : badgeList) {
+            if(db.getBadgeDao().verifyID(badge.Id).isEmpty())
+                db.getBadgeDao().insertAll(badge);
+        }
+    }
+
     protected void createList(String jsonStr) {
         oeuvreList.clear();
         if (jsonStr != null) {
@@ -272,6 +286,8 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                             JSONArray techniqueArray = c.getJSONArray("Technique");
                             materiaux = treatTechnique(techniqueArray);}*/
                         //Rajouter le colet quartier dans le fichier JSON
+                        String categorie = c.getString("Categorie");
+                        String sousCategorie = c.getString("SousCategorie");
                         String quartier = c.getString("Arrondissement");
                         String dimension = c.getString("Dimension");
                         if (dimension.equals("null")){
@@ -298,22 +314,22 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                             artiste = new ArtisteObject(artiste_nom, artiste_prenom, artiste_id, false);
                             if (artiste_nom.equals("null")&&artiste_prenom.equals("null"))
                             {
-                                oeuvre = new OeuvreObject(titre, id, "Artiste inconnu", date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                                oeuvre = new OeuvreObject(titre, id, categorie, sousCategorie,"Artiste inconnu", date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
                             }
                             else if (artiste_nom.equals("null")){
-                                oeuvre = new OeuvreObject(titre, id, artiste_prenom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                                oeuvre = new OeuvreObject(titre, id,categorie, sousCategorie, artiste_prenom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
 
                             }
                             else if (artiste_prenom.equals("null")){
-                                oeuvre = new OeuvreObject(titre, id, artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                                oeuvre = new OeuvreObject(titre, id,categorie, sousCategorie, artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
 
                             }
                             else {
-                                oeuvre = new OeuvreObject(titre, id, artiste_prenom + " " + artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                                oeuvre = new OeuvreObject(titre, id,categorie, sousCategorie, artiste_prenom + " " + artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
                             }
                         } else {
                             artiste = new ArtisteObject(artiste_collectif, artiste_prenom, artiste_id, true);
-                                oeuvre = new OeuvreObject(titre, id, artiste_collectif, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
+                                oeuvre = new OeuvreObject(titre, id,categorie, sousCategorie, artiste_collectif, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
 
                         }
                         //OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste_prenom+ " "+artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);

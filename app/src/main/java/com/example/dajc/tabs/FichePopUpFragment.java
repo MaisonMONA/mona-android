@@ -99,7 +99,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View v;
         if (MainActivity.withImg==true) {
-            v = inflater.inflate(R.layout.fiche_popup, container, true);
+            v = inflater.inflate(R.layout.fiche_popup2, container, true);
             photo = (ImageView) v.findViewById(R.id.photo);
             date_ajout = (TextView) v.findViewById(R.id.tv_date);
             userC = (EditText) v.findViewById(R.id.user_comment);
@@ -144,20 +144,21 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
             });
         }
         else {
-            v = inflater.inflate(R.layout.fiche_popup_noimg, container, true);
+            v = inflater.inflate(R.layout.fiche_popup_noimg2, container, true);
             fav_b = (ImageButton) v.findViewById(R.id.button_fav);
             fav_b.setOnClickListener(this);
-            map = (MapView) v.findViewById(R.id.map);
-            map.setTileSource(TileSourceFactory.MAPNIK);
 
-            //set default zoom buttons and ability to zoom with fingers
-            map.setBuiltInZoomControls(false);
-            map.setMultiTouchControls(true);
-
-            //set map default view point
-            mapController = map.getController();
-            mapController.setZoom(15);
         }
+        map = (MapView) v.findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+
+        //set default zoom buttons and ability to zoom with fingers
+        map.setBuiltInZoomControls(false);
+        map.setMultiTouchControls(true);
+
+        //set map default view point
+        mapController = map.getController();
+        mapController.setZoom(15);
         oeuvreList = FirstActivity.getOeuvreList();
         numOeuvre = MainActivity.numOeuvre;
         System.out.println("OnCreateView");
@@ -294,7 +295,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 +  "Technique: " + tech_oeuvre + "\n"
                 + "Matériau: " + mat_oeuvre;
         infos.setText(information);
-        if(MainActivity.withImg==false){
+        if(MainActivity.withImg==false || MainActivity.withImg==true){
             ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
             String idItem = object.getId();
             double art_lati = object.getLocationX();
@@ -348,7 +349,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 String currentPath = f.getAbsolutePath();
                 Log.d("photo", "image : " + currentPath);
                 FileOutputStream fout= new FileOutputStream(currentPath);
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fout);
 
                 String timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
 

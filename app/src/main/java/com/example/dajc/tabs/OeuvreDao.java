@@ -36,6 +36,18 @@ public interface OeuvreDao {
     List<OeuvreObject> getAllOeuvreQuartier(String quartier);
     @Query("SELECT * FROM oeuvre WHERE URI!='' ")
     List<OeuvreObject> getGalleryList();
+    @Query("SELECT count(URI) FROM oeuvre WHERE URI!='' ")
+    int getCountCollection();
     @Update
     public void updateUsers(OeuvreObject... oeuvre);
+
+    //query for badges
+    @Query("SELECT count(Quartier) FROM oeuvre WHERE Quartier=:CONDITION AND URI!='' ")
+    int getconditionCountQuartier(String CONDITION);
+    @Query("SELECT count(Categorie) FROM oeuvre WHERE Categorie=:CONDITION AND URI!='' ")
+    int getconditionCountCategorie(String CONDITION);
+    @Query("SELECT count(Id) FROM oeuvre WHERE Id=:CONDITION AND URI!='' ")
+    int getconditionCountId(String CONDITION);
+    @Query("SELECT count(SousCategorie) FROM oeuvre WHERE SousCategorie=:CONDITION AND URI!='' ")
+    int getconditionCountSousCat(String CONDITION);
 }

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private ListView lv;
     ArrayList<OeuvreObject> oeuvreList; //liste d'oeuvre qui sera passée à chaque activité
+    ArrayList<BadgeObject> badgeList; //liste d'oeuvre qui sera passée à chaque activité
     static Permissions Permission;
     static OnSwipeTouchListener onSwipeTouchListener;
 
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             Permission.requestAll();
         }
         new getOeuvre().execute();
+       // new getBadge().execute();
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         //pager = (ViewPager) findViewById(R.id.pager);
         //custom pager without swiping
@@ -117,6 +119,11 @@ public class MainActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.settings) {
             Intent intent = new Intent(this, PreferencesActivity.class);
+            intent.putExtra("List", oeuvreList);
+            startActivity(intent);
+        }
+        else if(item.getItemId() == R.id.badges) {
+            Intent intent = new Intent(this, Badge_Activity.class);
             intent.putExtra("List", oeuvreList);
             startActivity(intent);
         }
@@ -170,6 +177,10 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new GalleryFragment();
             }
 
+            else if(position == 4){
+                fragment = new MapFragment();
+            }
+
             else {
                 fragment = new FicheFragment();
             }
@@ -196,8 +207,10 @@ public class MainActivity extends AppCompatActivity {
                 titre = "Carte";
             } else if (position == 2) {
                 titre = "Liste";
-            } else {
+            } else if(position == 3){
                 titre = "Galerie";
+            } else {
+                titre = "Badge";
             }
 
             return titre;
@@ -289,6 +302,13 @@ public class MainActivity extends AppCompatActivity {
             return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
         }
     }
+    /*private class getBadge extends AsyncTask<Void, Void, ArrayList<BadgeObject>> {
+        @Override
+        protected ArrayList<BadgeObject> doInBackground(Void... voids) {
+            badgeList =new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
+            return new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
+        }
+    }*/
 
 
 }

@@ -20,6 +20,8 @@ public class OeuvreObject implements Parcelable {
     public int Note;
     public String Quartier;
     public String Dimension;
+    public String Categorie;
+    public String SousCategorie;
     public String Technique;
     //public ArtisteObject Artiste;
     public String Artiste;
@@ -40,6 +42,12 @@ public class OeuvreObject implements Parcelable {
 
     public String getTitre() {
         return Titre;
+    }
+    public String getCategorie() {
+        return Categorie;
+    }
+    public String getSousCategorie() {
+        return SousCategorie;
     }
     /*
     public ArtisteObject getArtiste() {
@@ -128,7 +136,7 @@ public class OeuvreObject implements Parcelable {
         Id = id;
     }
     public OeuvreObject(){};
-    public OeuvreObject(String titre, String id, String artiste, String datedeCreation, String materiaux, double locationX, double locationY, int etat, String URI, String commentaire, int note, String quartier, String dimension, String technique) {
+    public OeuvreObject(String titre, String id, String categorie, String sousCategorie, String artiste, String datedeCreation, String materiaux, double locationX, double locationY, int etat, String URI, String commentaire, int note, String quartier, String dimension, String technique) {
         Titre = titre;
         Id = id;
         Artiste = artiste;
@@ -136,6 +144,8 @@ public class OeuvreObject implements Parcelable {
         Materiaux = materiaux;
         LocationX = locationX;
         LocationY = locationY;
+        Categorie = categorie;
+        SousCategorie = sousCategorie;
         Etat = etat;
         this.URI = URI;
         Commentaire = commentaire;
@@ -164,6 +174,8 @@ public class OeuvreObject implements Parcelable {
         this.Materiaux = in.readString();
         this.LocationX = in.readDouble();
         this.LocationY = in.readDouble();
+        this.Categorie = in.readString();
+        this.SousCategorie = in.readString();
         this.URI = in.readString();
         this.Commentaire = in.readString();
         this.Note = in.readInt();
@@ -191,6 +203,8 @@ public class OeuvreObject implements Parcelable {
         dest.writeString(this.Materiaux);
         dest.writeDouble(this.LocationX);
         dest.writeDouble(this.LocationY);
+        dest.writeString(this.Categorie);
+        dest.writeString(this.SousCategorie);
         dest.writeString(this.URI);
         dest.writeString(this.Commentaire);
         dest.writeInt(this.Note);

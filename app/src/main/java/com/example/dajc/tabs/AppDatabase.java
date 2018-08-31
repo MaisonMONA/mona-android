@@ -8,7 +8,9 @@ import android.arch.persistence.room.RoomDatabase;
  * Created by emile on 2018-03-01.
  */
 
-@Database(entities = {OeuvreObject.class /*, AnotherEntityType.class, AThirdEntityType.class */}, version = 1, exportSchema = false)
+@Database(entities = {OeuvreObject.class , BadgeObject.class/*, AcquisitionObject.class*/ }, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract OeuvreDao getOeuvreDao();
+    public abstract BadgeDao getBadgeDao();
+    //public abstract AcquisitionDao getAcquisitionDao();
 }
