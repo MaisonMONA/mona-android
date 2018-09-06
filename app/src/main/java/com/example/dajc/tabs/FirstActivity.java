@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
 
@@ -53,14 +54,26 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     static ArrayList<BadgeObject> badgeList = new ArrayList<BadgeObject>();
     public static AppDatabase db;
     public static AppDatabase getDb(){return db;}
+    public boolean logged;
+    int users;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.first_activity);
+
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "oeuvre-database").build();
-
+        try {
+            new getlogged().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        if(users>0)
+            logged=true;
+        else logged = false;
         //TODO faire les quatres cas... pour le moment seul trois cas fonctionnent
         if (isNetworkAvailable()) {
             /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
@@ -91,10 +104,14 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     @Override
     protected void onResume() {
         super.onResume();
-        if(oeuvreList.size()>0){
+        if(oeuvreList.size()>0&&logged){
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
         }
+        else if(oeuvreList.size()>0){
+            System.out.println("nani1");
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);}
 
     }
 
@@ -109,20 +126,36 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         @Override
         protected Void doInBackground(Void... arg0) {
 
-
-                createList(null);
+            createList(null);
                 createBadges();
+
 
 
             return null;
         }
         @Override
         protected void onPostExecute(Void unused) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("OeuvreList", oeuvreList);
-            startActivity(intent);
+            if(logged) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("OeuvreList", oeuvreList);
+                startActivity(intent);
+            }
+            else{
+                System.out.println("nani2");
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.putExtra("OeuvreList", oeuvreList);
+                startActivity(intent);}
         }
     }
+    private class getlogged extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected Integer doInBackground(Void... voids) {
+
+                users=FirstActivity.getDb().getUserDao().numberofuser();
+            return 1;
+        }
+    }
+
     private class UpdateOeuvres extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -181,6 +214,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             if (jsonStr != null) {
                 createList(jsonStr);
                 createBadges();
+
 /*
                 try {
                     Writer output = null;
@@ -207,9 +241,16 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
         @Override
         protected void onPostExecute(Void unused) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("List", oeuvreList);
-            startActivity(intent);
+            if(logged){
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("List", oeuvreList);
+                startActivity(intent);}
+            else{
+                System.out.println("nani3");
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.putExtra("OeuvreList", oeuvreList);
+                startActivity(intent);}
             /*String param = "?Authorization=" + "allo";
             System.out.println("J<ao communnique au serveur");
             URL obj = null;
@@ -243,6 +284,9 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             if(db.getBadgeDao().verifyID(badge.Id).isEmpty())
                 db.getBadgeDao().insertAll(badge);
         }
+        if(logged)
+            logged=true;
+
     }
 
     protected void createList(String jsonStr) {

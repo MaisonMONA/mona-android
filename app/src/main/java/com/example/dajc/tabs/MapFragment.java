@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -77,6 +78,15 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     double mtl_longi;
 
     ImageButton locationButton;
+    ImageButton imgcollectionbutton;
+    ImageButton imgciblebutton;
+    ImageButton imgnonvisitebutton;
+    Button collectionbutton;
+    Button ciblebutton;
+    Button nonvisitebutton;
+    Boolean ciblee;
+    Boolean collectionnee;
+    Boolean nonvisitee;
 
     View v;
 
@@ -87,10 +97,26 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        ciblee=true;
+        collectionnee=true;
+        nonvisitee=true;
         v = inflater.inflate(R.layout.map_frag_layout, container, false);
 
         locationButton = (ImageButton) v.findViewById(R.id.button_location);
         locationButton.setOnClickListener(this);
+        imgcollectionbutton = (ImageButton) v.findViewById(R.id.imageCollectionButton);
+        imgcollectionbutton.setOnClickListener(this);
+        imgciblebutton = (ImageButton) v.findViewById(R.id.imageCibleeButton3);
+        imgciblebutton.setOnClickListener(this);
+        imgnonvisitebutton = (ImageButton) v.findViewById(R.id.imageNonVisiteeButton2);
+        imgnonvisitebutton.setOnClickListener(this);
+        collectionbutton = (Button) v.findViewById(R.id.collection_button);
+        collectionbutton.setOnClickListener(this);
+        ciblebutton = (Button) v.findViewById(R.id.cible_button);
+        ciblebutton.setOnClickListener(this);
+        nonvisitebutton = (Button) v.findViewById(R.id.non_visitebutton);
+        nonvisitebutton.setOnClickListener(this);
 
         //set map view
         map = (MapView) v.findViewById(R.id.map);
@@ -156,7 +182,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         // ItemizedIconOverlay<OverlayItem> items = new ItemizedIconOverlay<OverlayItem>(
         //         new ArrayList<OverlayItem>(), artMarker, null,
         //       new DefaultResourceProxyImpl(getActivity()));
-        ArrayList<OverlayItem> items2 = new ArrayList<OverlayItem>();
         // example items.add(new OverlayItem("Title", "Description", new GeoPoint(0.0d,0.0d))); // Lat/Lon decimal degrees
         String title;
         String idItem;
@@ -165,6 +190,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         int item_nb = 0;
         OverlayItem myOverlayItem;
         Drawable artMarker = getResources().getDrawable(R.drawable.ic_pingreen);
+        Drawable artMarker2 = getResources().getDrawable(R.drawable.ic_pinblue);
+        Drawable artMarker3 = getResources().getDrawable(R.drawable.ic_pingold);
         //dbh = new DBHelper(Activity.this);
         for (int i=0;i<oeuvreList.size();i++)
         {
@@ -172,14 +199,21 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             idItem = oeuvreList.get(i).getId();
             art_lati = oeuvreList.get(i).getLocationX();
             art_longi = oeuvreList.get(i).getLocationY();
-            if (oeuvreList.get(i).getEtat()==1)
+            if (oeuvreList.get(i).getEtat()==2&&collectionnee)
             {
-                OverlayItem myOverlayItem2 = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
-                items2.add(myOverlayItem2);
+                myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
+                myOverlayItem.setMarker(artMarker3);
+                items.add(myOverlayItem);
             }
-            else {
+            else if (oeuvreList.get(i).getEtat()==1&&ciblee)
+        {
+            myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
+            myOverlayItem.setMarker(artMarker2);
+            items.add(myOverlayItem);
+        }
+            else if(nonvisitee){
                 //System.out.println(oeuvreList.get(i).getEtat());
-                System.out.println("this is an ID "+ idItem);
+                //System.out.println("this is an ID "+ idItem);
                 myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker);
                 items.add(myOverlayItem);
@@ -210,7 +244,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 //new changeFrag().execute((index));
                 MainActivity.numOeuvre= Integer.parseInt(item.getUid());
                 if(oeuvreList.get(index).getEtat()==2){
-                    MainActivity.withImg=true;
+                    MainActivity.withImg=false;
                 }
                 else{
                     MainActivity.withImg=false;
@@ -222,7 +256,9 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 return false;
             }
 
+
         };
+
         mResourceProxy = new DefaultResourceProxyImpl(getContext());
         //the overlay
         ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay
@@ -230,14 +266,31 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         mOverlay.setFocusItemsOnTap(true);
         map.getOverlays().add(mOverlay);
 
-        Drawable artMarker2 = getResources().getDrawable(R.drawable.mapiconred);
-        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<OverlayItem>(
-                items2, artMarker2, null,
-                new DefaultResourceProxyImpl(getActivity()));
-
-        map.getOverlays().add(overlay);
 
         Log.d("map", "Overlay added");
+        updateIcone();
+    }
+
+
+    private void updateIcone(){
+        if(collectionnee){
+            imgcollectionbutton.setImageResource(R.drawable.ic_pingold);
+        }
+        else{
+            imgcollectionbutton.setImageResource(R.drawable.ic_pingold_gray);
+        }
+        if(ciblee){
+            imgciblebutton.setImageResource(R.drawable.ic_pinblue);
+        }
+        else{
+            imgciblebutton.setImageResource(R.drawable.ic_pinblue_gray);
+        }
+        if(nonvisitee){
+            imgnonvisitebutton.setImageResource(R.drawable.ic_pingreen);
+        }
+        else{
+            imgnonvisitebutton.setImageResource(R.drawable.ic_pingreen_gray);
+        }
     }
     public void refreshDialog(){
         //en prevision du swipe
@@ -313,6 +366,24 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             case R.id.button_location:
                 startPoint = new GeoPoint(lati, longi);
                 mapController.setCenter(startPoint);
+                break;
+            case R.id.non_visitebutton:
+            case R.id.imageNonVisiteeButton2:
+                nonvisitee = !nonvisitee;
+                updateIcone();
+                updateMap();
+                break;
+            case R.id.collection_button:
+            case R.id.imageCollectionButton:
+                collectionnee = !collectionnee;
+                updateMap();
+                updateIcone();
+                break;
+            case R.id.cible_button:
+            case R.id.imageCibleeButton3:
+                ciblee = !ciblee;
+                updateMap();
+                updateIcone();
                 break;
         }
     }

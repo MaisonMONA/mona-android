@@ -1,8 +1,10 @@
 package com.example.dajc.tabs;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,13 +19,19 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.DynamicDrawableSpan;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -84,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         //pager = (ViewPager) findViewById(R.id.pager);
         //custom pager without swiping
         pager = findViewById(R.id.pager);
+
         //pager.setPagingEnabled(false);
 
 
@@ -130,6 +139,22 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent( event );
+    }
 
     public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
         List<Drawable> icons = new ArrayList<Drawable>();
@@ -139,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         public PagerAdapter(FragmentManager fm) {
             super(fm);
             pager.addOnPageChangeListener(this);
-/*
+
             Drawable icon1 =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             Drawable icon1Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_home_active);
             Drawable icon2 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_passive);
@@ -157,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
             iconsHilighted.add(icon1Hilighted);
             iconsHilighted.add(icon2Hilighted);
             iconsHilighted.add(icon3Hilighted);
-            iconsHilighted.add(icon4Hilighted);*/
+            iconsHilighted.add(icon4Hilighted);
         }
 
 
@@ -189,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
             args.putParcelableArrayList("List",oeuvreList);
             args.putInt("numOeuvre", numOeuvre);
             fragment.setArguments(args);
+
             return fragment;
         }
 
@@ -200,19 +226,31 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             String titre;
+            Drawable drawable;
             if (position == 0) {
                 titre = "Oeuvre du jour";
-
+                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             } else if (position == 1) {
                 titre = "Carte";
+                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             } else if (position == 2) {
                 titre = "Liste";
+                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             } else if(position == 3){
                 titre = "Galerie";
+                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             } else {
                 titre = "Badge";
+                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             }
-
+            SpannableStringBuilder sb = new SpannableStringBuilder("   " + titre); // space added before text for convenience
+            try {
+                drawable.setBounds(5, 5, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                ImageSpan span = new ImageSpan(drawable, DynamicDrawableSpan.ALIGN_BASELINE);
+                sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
             return titre;
         }
 
@@ -221,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
         }
 */
         public void setTabIcon() {
-            /*for(int i = 0; i < icons.size(); i++) {
+            for(int i = 0; i < icons.size(); i++) {
                 if(i == 0) {
                     //noinspection ConstantConditions
                     tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
@@ -230,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                     //noinspection ConstantConditions
                     tabLayout.getTabAt(i).setIcon(icons.get(i));
                 }
-            }*/
+            }
         }
 
         @Override

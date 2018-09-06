@@ -2,7 +2,9 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="Yellow">#ffff00</color>
+    <color name="Yellow">#fad901</color>
     <color name="colorAccent">#FF4081</color>
     <color name="lightgrey">#dddddd</color>
+    <color name="magenta">#da4167</color>
+    <color name="marine">#1a4586</color>
 </resources>
