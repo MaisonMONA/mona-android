@@ -158,7 +158,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                     editor.putBoolean("comment", true);
                     editor.commit();*/
                     object.setCommentaire(String.valueOf(s));
-                    new ServerUpdate("comment",""+String.valueOf(s),"addComment").execute();
+                    //new ServerUpdate("comment",""+String.valueOf(s),"addComment").execute();
                     new updateOeuvre().execute(object);
                 }
 
