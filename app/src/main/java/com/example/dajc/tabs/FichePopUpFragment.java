@@ -2,6 +2,7 @@ package com.example.dajc.tabs;
 
 import android.annotation.TargetApi;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -258,6 +259,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
         else if (etat_o==0){
             fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
         }
+        cam_b.setMinimumWidth(cam_b.getHeight());
         //si l'oeuvre est dans la galerie, on ne peut pas prendre de photo ou l'ajouter aux favoris
         //par contre, on affiche la date à laquelle la photo a été prise
         if (etat_o == 2) {
@@ -320,9 +322,14 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
             String idItem = object.getId();
             double art_lati = object.getLocationX();
             double art_longi = object.getLocationY();
-            OverlayItem myOverlayItem = new OverlayItem(idItem, titre_o, idItem, new GeoPoint(art_lati, art_longi));
-            Drawable artMarker = getResources().getDrawable(R.drawable.mapiconred);
-            myOverlayItem.setMarker(artMarker);
+            OverlayItem myOverlayItem = new OverlayItem(idItem, titre_o, object.getArtiste(), new GeoPoint(art_lati, art_longi));
+            Drawable artMarker;
+            if(object.getEtat()==2)
+                artMarker = getResources().getDrawable(R.drawable.ic_pingold);
+            else if(object.getEtat()==1)
+                artMarker = getResources().getDrawable(R.drawable.ic_pingreen);
+            else
+                artMarker = getResources().getDrawable(R.drawable.ic_pinblue);            myOverlayItem.setMarker(artMarker);
             items.add(myOverlayItem);
             ItemizedIconOverlay.OnItemGestureListener iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
                 //ItemizedIconOverlay iOverlay = new ItemizedIconOverlay(overlay, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -460,6 +467,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 break;
 
             case R.id.button_cam:
+                float range = 75;//metres
+                if(inRange(MainActivity.lati,MainActivity.longi,object.getLocationX(),object.getLocationY(),range)){
                 if (!MainActivity.Permission.checkPermissionForCamera()) {
                     MainActivity.Permission.requestPermissionForCamera();
                 }
@@ -485,12 +494,18 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                             );
                             //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mediaFile));*/
                         startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
+                    }
+                }
+                }
+                        else Toast.makeText(getActivity(),
+                            "vous devez vous rapprocher",
+                            Toast.LENGTH_SHORT).show();
                         break;
                          /*catch (IOException e) {
                             e.printStackTrace();
                         }*/
-                    }
-                }
+
+
 /*
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra("List", oeuvreList);
@@ -1046,6 +1061,27 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
             System.out.println("responsenani : "+response.toString());
             return response.toString();
         }
+    }
+
+    public static boolean inRange(double lat1,double lon1,double lat2,double lon2,float range){
+        Location loc1 = new Location("");
+        loc1.setLatitude(lat1);
+        loc1.setLongitude(lon1);
+
+        Location loc2 = new Location("");
+        loc2.setLatitude(lat2);
+        loc2.setLongitude(lon2);
+
+        float distanceInMeters = loc1.distanceTo(loc2);
+        System.out.println("range : ->" +distanceInMeters);
+        System.out.println("lat1 : ->" +lat1);
+        System.out.println("lon1 : ->" +lon1);
+        System.out.println("lat2 : ->" +lat2);
+        System.out.println("lon2 : ->" +lon2);
+        if(distanceInMeters<=range)
+            return true;
+        else
+            return false;
     }
 
 }

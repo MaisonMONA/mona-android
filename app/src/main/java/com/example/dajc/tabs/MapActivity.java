@@ -39,6 +39,8 @@ public class MapActivity extends Activity implements LocationListener {
     int numOeuvre;
     double lati;
     double longi;
+    static double lat;
+    static double lon;
 
     String titre;
     int etat;
@@ -139,6 +141,8 @@ public class MapActivity extends Activity implements LocationListener {
             Log.d("gps", "location changed " + location.getLatitude() + "," + location.getLongitude());
             lati = location.getLatitude();
             longi = location.getLongitude();
+            lat = location.getLatitude();
+            lon = location.getLongitude();
             startPoint = new GeoPoint(lati, longi);
 
             setMarker(); //set an own marker

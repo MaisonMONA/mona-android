@@ -1,5 +1,6 @@
 package com.example.dajc.tabs;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,12 +17,16 @@ import java.util.concurrent.ExecutionException;
 public class Badge_Activity extends AppCompatActivity {
 
     public static ArrayList<BadgeObject> badgeList;
+    public static BadgeObject[] badgeArray;
     public static int oeuvreCount;
+    static public BadgeObject selectedbadge;
+    static public BadgeObject getbadge(){return selectedbadge;}
     String[] names ;
     int[] tmpProgress;
     int[] objectives ;
     int[] progress;
     int sculpturecount;
+    FichePopUpFragment dialogFragment;
     int installationcount;
     int muralecount;
     int[] imageId = {
@@ -61,10 +66,12 @@ public class Badge_Activity extends AppCompatActivity {
         objectives = new int[numBadge];
         progress = new int[numBadge];
         imageId = new int[numBadge];
+        badgeArray = new BadgeObject[numBadge];
         for(BadgeObject badge:badgeList){
             int pos = badgeList.indexOf(badge);
 
             System.out.println(pos);
+            badgeArray[pos]=badge;
             names[pos]=badge.getTitre();
             objectives[pos]=badge.getObjective();
             progress[pos]=badge.getProgress();
@@ -96,7 +103,9 @@ public class Badge_Activity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                Toast.makeText(getApplicationContext(), "You Clicked at " +names[+ position], Toast.LENGTH_SHORT).show();
+                selectedbadge = badgeArray[position];
+                Intent intent = new Intent(getApplicationContext(), BadgePopFragment.class);
+                startActivity(intent);
 
             }
         });

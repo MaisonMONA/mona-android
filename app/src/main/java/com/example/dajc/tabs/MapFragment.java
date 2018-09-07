@@ -185,6 +185,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         // example items.add(new OverlayItem("Title", "Description", new GeoPoint(0.0d,0.0d))); // Lat/Lon decimal degrees
         String title;
         String idItem;
+        String artist;
         double art_lati;
         double art_longi;
         int item_nb = 0;
@@ -199,6 +200,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             idItem = oeuvreList.get(i).getId();
             art_lati = oeuvreList.get(i).getLocationX();
             art_longi = oeuvreList.get(i).getLocationY();
+            artist = oeuvreList.get(i).getArtiste();
+
             if (oeuvreList.get(i).getEtat()==2&&collectionnee)
             {
                 myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
@@ -214,7 +217,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             else if(nonvisitee){
                 //System.out.println(oeuvreList.get(i).getEtat());
                 //System.out.println("this is an ID "+ idItem);
-                myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
+                myOverlayItem = new OverlayItem(idItem, title, artist, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker);
                 items.add(myOverlayItem);
 
@@ -223,7 +226,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         }
 
 
-        Log.d("map", "Items added = " + item_nb);
+        //Log.d("map", "Items added = " + item_nb);
         ItemizedIconOverlay.OnItemGestureListener iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             //ItemizedIconOverlay iOverlay = new ItemizedIconOverlay(overlay, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
             @Override
@@ -307,6 +310,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     @Override
     public void onLocationChanged(Location location) {
         Log.d("gps","location changed "+location.getLatitude()+","+location.getLongitude());
+        System.out.println("nani");
         lati = location.getLatitude();
         longi = location.getLongitude();
         MainActivity.lati=lati;
@@ -366,6 +370,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             case R.id.button_location:
                 startPoint = new GeoPoint(lati, longi);
                 mapController.setCenter(startPoint);
+                mapController.zoomTo(17);
                 break;
             case R.id.non_visitebutton:
             case R.id.imageNonVisiteeButton2:

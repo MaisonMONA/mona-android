@@ -288,8 +288,14 @@ FicheFragment extends Fragment implements View.OnClickListener {
             String idItem = object.getId();
             double art_lati = object.getLocationX();
             double art_longi = object.getLocationY();
-            OverlayItem myOverlayItem = new OverlayItem(idItem, titre_o, idItem, new GeoPoint(art_lati, art_longi));
-            Drawable artMarker = getResources().getDrawable(R.drawable.mapiconred);
+            OverlayItem myOverlayItem = new OverlayItem(idItem, titre_o, object.getArtiste(), new GeoPoint(art_lati, art_longi));
+            Drawable artMarker;
+            if(object.getEtat()==2)
+                artMarker = getResources().getDrawable(R.drawable.ic_pingold);
+            else if(object.getEtat()==1)
+                artMarker = getResources().getDrawable(R.drawable.ic_pingreen);
+            else
+                artMarker = getResources().getDrawable(R.drawable.ic_pinblue);
             myOverlayItem.setMarker(artMarker);
             items.add(myOverlayItem);
             ItemizedIconOverlay.OnItemGestureListener iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -428,7 +434,8 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 MainActivity.MapFrag(0);
                 break;
 
-            case R.id.button_cam:
+            case R.id.button_cam:float range = 75;//metres
+                if(FichePopUpFragment.inRange(MainActivity.lati,MainActivity.longi,object.getLocationX(),object.getLocationY(),range)){
                 if (!MainActivity.Permission.checkPermissionForCamera()) {
                     MainActivity.Permission.requestPermissionForCamera();
                 }
@@ -460,7 +467,13 @@ FicheFragment extends Fragment implements View.OnClickListener {
                             e.printStackTrace();
                         }*/
                     }
-                }
+                }}
+                else Toast.makeText(getActivity(),
+                            "vous devez vous rapprocher",
+                            Toast.LENGTH_SHORT).show();
+                    break;
+
+
 /*
                 intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra("List", oeuvreList);
