@@ -33,6 +33,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
@@ -43,9 +46,23 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -93,6 +110,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
     ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
+    String username;
+    String password;
 
     SharedPreferences changes;
     @Override
@@ -114,8 +133,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                     editor.putBoolean("rating", true);
                     editor.commit();*/
                     object.setNote((int) rating);
+                    new ServerUpdate("note",""+rating,"addNote").execute();
                     new updateOeuvre().execute(object);
-
                 }
             });
 
@@ -138,6 +157,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                     editor.putBoolean("comment", true);
                     editor.commit();*/
                     object.setCommentaire(String.valueOf(s));
+                    new ServerUpdate("comment",""+String.valueOf(s),"addComment").execute();
                     new updateOeuvre().execute(object);
                 }
 
@@ -361,6 +381,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 object.setDatedePhoto(timeStamp);
                 object.setURI(currentPath);
                 object.setEtat(2);
+
+                new ServerUpdatePicture(f).execute();
                 new updateOeuvre().execute(object);
                 MainActivity.withImg=true;
                 if(MainActivity.caller.equals("List")){
@@ -587,6 +609,9 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
         @Override
         protected Void doInBackground(Void... voids) {
             oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
+            ArrayList<userObject> userobjects =new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
+            username = userobjects.get(0).getUser();
+            password = userobjects.get(0).getPw();
             object=oeuvreList.get(0);
             return null;
         }
@@ -597,4 +622,430 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
             finishUI();
         }
     }
+
+
+    public class ServerUpdate extends AsyncTask<Void, Void, Boolean> {
+
+        String Attribute;
+        String Value;
+        String Request;
+
+        ServerUpdate(String attribute,String value,String request) {
+            Attribute = attribute;
+            Value = value;
+            Request = request;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            if(comm()){
+                return true;}
+            else return false;}
+
+
+
+        protected boolean comm() {
+            boolean success = false;
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            //String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
+            //String url ="www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson";
+            //String jsonStr = sh.makeServiceCall(url);
+            StringBuilder result = new StringBuilder();
+            URL url = null;
+            try {
+                url = new URL(
+                        "http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request="+Request+"&username="+
+                                username+
+                                "&password="+password+"&"+
+                                Attribute+"="+Value+"&"+
+                                "IDOeuvre="+numOeuvre);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                conn.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            BufferedReader rd = null;
+            try {
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String line;
+            try {
+                while ((line = rd.readLine()) != null) {
+                    result.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                rd.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String jsonStr = result.toString();
+
+            //Log.e(TAG, "Response from url: " + jsonStr);
+            if (jsonStr != null) {
+                try{
+                    JSONArray oeuvres = new JSONArray("["+jsonStr+"]");
+
+                    JSONObject c = oeuvres.getJSONObject(0);
+                    success =c.getBoolean("successful");
+                    System.out.println("nani"+success);
+
+                }catch (JSONException e) {
+                    e.printStackTrace();
+                }
+/*
+                try {
+                    Writer output = null;
+                    File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
+                    output = new BufferedWriter(new FileWriter(file));
+                    output.write(jsonStr);
+                    output.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "File Saving error: " + e.getMessage());
+                }
+            } else {
+                //Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });*/
+            }
+
+            return success;
+        }
+    }public class ServerUpdatePicture extends AsyncTask<Void, Void, Boolean> {
+
+        String Attribute;
+        String Value;
+        String Request;
+
+        String attachmentName = "bitmap";
+        String attachmentFileName = "bitmap.bmp";
+        String crlf = "\r\n";
+        String twoHyphens = "--";
+        String boundary =  "*****";
+        File file;
+        ServerUpdatePicture(File f) {
+            file=f;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            try {
+                if(comm()){
+                    return true;}
+                else return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+
+
+
+        protected boolean comm() throws IOException {
+            boolean success = false;
+
+            String charset = "UTF-8";
+            String requestURL = "http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/";
+            File filesDir = getContext().getFilesDir();
+            File imageFile = new File(filesDir,uri_photo);
+            MultipartUtility multipart = new MultipartUtility(requestURL, charset);
+            multipart.addFormField("username", username);
+            multipart.addFormField("password", password);
+            multipart.addFormField("IDOeuvre", ""+numOeuvre);
+            multipart.addFormField("request", "addPicture");
+            multipart.addFilePart("file",  file);
+            String response = multipart.finish(); // response from server.
+
+/*
+            Bitmap bitmap = BitmapFactory.decodeFile(uri_photo);
+            String attachmentName = "bitmap";
+            String attachmentFileName = "bitmap.bmp";
+            String crlf = "\r\n";
+            String twoHyphens = "--";
+            String boundary =  "*****";
+            String urlParameters =  "?username="+username+
+                                    "&password="+password+
+                                    "&IDOeuvre="+numOeuvre+
+                                    "&request=addPicture";
+
+            HttpURLConnection httpUrlConnection = null;
+            URL url = new URL("http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/"+urlParameters);
+            httpUrlConnection = (HttpURLConnection) url.openConnection();
+            httpUrlConnection.setUseCaches(false);
+            httpUrlConnection.setDoOutput(true);
+
+            httpUrlConnection.setRequestMethod("POST");
+            byte[] postDataBytes = urlParameters.getBytes("UTF-8");
+            httpUrlConnection.setRequestProperty("Connection", "Keep-Alive");
+            httpUrlConnection.setRequestProperty("Cache-Control", "no-cache");
+            httpUrlConnection.setRequestProperty(
+                    "Content-Type", "multipart/form-data;boundary=" + boundary);
+            httpUrlConnection.getOutputStream().write(postDataBytes);
+            DataOutputStream request = new DataOutputStream(
+                    httpUrlConnection.getOutputStream());
+
+            request.writeBytes(this.twoHyphens + this.boundary + this.crlf);
+            request.writeBytes("Content-Disposition: form-data; name=\"" +
+                    this.attachmentName + "\";filename=\"" +
+                    this.attachmentFileName + "\"" + this.crlf);
+            request.writeBytes(this.crlf);
+
+            byte[] pixels = new byte[bitmap.getWidth() * bitmap.getHeight()];
+            for (int i = 0; i < bitmap.getWidth(); ++i) {
+                for (int j = 0; j < bitmap.getHeight(); ++j) {
+                    //we're interested only in the MSB of the first byte,
+                    //since the other 3 bytes are identical for B&W images
+                    pixels[i + j] = (byte) ((bitmap.getPixel(i, j) & 0x80) >> 7);
+                }
+            }
+
+            request.write(pixels);
+
+            request.writeBytes(this.crlf);
+            request.writeBytes(this.twoHyphens + this.boundary +
+                    this.twoHyphens + this.crlf);
+
+            request.flush();
+            request.close();
+
+            InputStream responseStream = new
+                    BufferedInputStream(httpUrlConnection.getInputStream());
+
+            BufferedReader responseStreamReader =
+                    new BufferedReader(new InputStreamReader(responseStream));
+
+            String line = "";
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while ((line = responseStreamReader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            responseStreamReader.close();
+
+            String response = stringBuilder.toString();
+            responseStream.close();
+            httpUrlConnection.disconnect();*/
+/*
+
+
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            //String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
+            //String url ="www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson";
+            //String jsonStr = sh.makeServiceCall(url);
+            URL url = null;
+            url = new URL(
+            "http://www-etud.iro.umontreal.ca/");
+            HttpURLConnection conn;
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Connection", "Keep-Alive");
+*/
+
+
+
+/*
+            String jsonStr = response;
+
+            //Log.e(TAG, "Response from url: " + jsonStr);
+            if (jsonStr != null) {
+                try{
+                    JSONArray oeuvres = new JSONArray("["+jsonStr+"]");
+
+                    JSONObject c = oeuvres.getJSONObject(0);
+                    success =c.getBoolean("successful");
+                    System.out.println("nani"+success);
+
+                }catch (JSONException e) {
+                    e.printStackTrace();
+                }
+/*
+                try {
+                    Writer output = null;
+                    File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
+                    output = new BufferedWriter(new FileWriter(file));
+                    output.write(jsonStr);
+                    output.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "File Saving error: " + e.getMessage());
+                }
+            } else {
+                //Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            return success;*/return true;
+        }
+    }
+    public class MultipartUtility {
+
+        private final String boundary;
+        private static final String LINE_FEED = "\r\n";
+        private HttpURLConnection httpConn;
+        private String charset;
+        private OutputStream outputStream;
+        private PrintWriter writer;
+
+        /**
+         * This constructor initializes a new HTTP POST request with content type
+         * is set to multipart/form-data
+         *
+         * @param requestURL
+         * @param charset
+         * @throws IOException
+         */
+        public MultipartUtility(String requestURL, String charset)
+                throws IOException {
+            this.charset = charset;
+
+            // creates a unique boundary based on time stamp
+            boundary = "===" + System.currentTimeMillis() + "===";
+
+            URL url = new URL(requestURL);
+            Log.e("URL", "URL : " + requestURL.toString());
+            httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setUseCaches(false);
+            httpConn.setDoOutput(true); // indicates POST method
+            httpConn.setDoInput(true);
+            httpConn.setRequestProperty("Content-Type",
+                    "multipart/form-data; boundary=" + boundary);
+            httpConn.setRequestProperty("User-Agent", "CodeJava Agent");
+            httpConn.setRequestProperty("Test", "Bonjour");
+            outputStream = httpConn.getOutputStream();
+            writer = new PrintWriter(new OutputStreamWriter(outputStream, charset),
+                    true);
+        }
+
+        /**
+         * Adds a form field to the request
+         *
+         * @param name  field name
+         * @param value field value
+         */
+        public void addFormField(String name, String value) {
+            writer.append("--" + boundary).append(LINE_FEED);
+            writer.append("Content-Disposition: form-data; name=\"" + name + "\"")
+                    .append(LINE_FEED);
+            writer.append("Content-Type: text/plain; charset=" + charset).append(
+                    LINE_FEED);
+            writer.append(LINE_FEED);
+            writer.append(value).append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Adds a upload file section to the request
+         *
+         * @param fieldName  name attribute in <input type="file" name="..." />
+         * @param uploadFile a File to be uploaded
+         * @throws IOException
+         */
+        public void addFilePart(String fieldName, File uploadFile)
+                throws IOException {
+            String fileName = uploadFile.getName();
+            writer.append("--" + boundary).append(LINE_FEED);
+            writer.append(
+                    "Content-Disposition: form-data; name=\"" + fieldName
+                            + "\"; filename=\"" + fileName + "\"")
+                    .append(LINE_FEED);
+            writer.append(
+                    "Content-Type: "
+                            + URLConnection.guessContentTypeFromName(fileName))
+                    .append(LINE_FEED);
+            writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
+            writer.append(LINE_FEED);
+            writer.flush();
+
+            FileInputStream inputStream = new FileInputStream(uploadFile);
+            byte[] buffer = new byte[4096];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            outputStream.flush();
+            inputStream.close();
+
+            writer.append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Adds a header field to the request.
+         *
+         * @param name  - name of the header field
+         * @param value - value of the header field
+         */
+        public void addHeaderField(String name, String value) {
+            writer.append(name + ": " + value).append(LINE_FEED);
+            writer.flush();
+        }
+
+        /**
+         * Completes the request and receives response from the server.
+         *
+         * @return a list of Strings as response in case the server returned
+         * status OK, otherwise an exception is thrown.
+         * @throws IOException
+         */
+        public String finish() throws IOException {
+            StringBuffer response = new StringBuffer();
+
+            writer.append(LINE_FEED).flush();
+            writer.append("--" + boundary + "--").append(LINE_FEED);
+            writer.close();
+
+            // checks server's status code first
+            int status = httpConn.getResponseCode();
+            if (status == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        httpConn.getInputStream()));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                httpConn.disconnect();
+            } else {
+                throw new IOException("Server returned non-OK status: " + status);
+            }
+            System.out.println("responsenani : "+response.toString());
+            return response.toString();
+        }
+    }
+
 }

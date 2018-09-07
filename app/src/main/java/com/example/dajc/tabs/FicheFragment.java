@@ -27,6 +27,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
@@ -37,9 +40,15 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -95,6 +104,8 @@ FicheFragment extends Fragment implements View.OnClickListener {
     ItemizedIconOverlay<OverlayItem> overlayL;
     int idDuJour;
 
+    String username;
+    String password;
     SharedPreferences changes;
 
 
@@ -136,6 +147,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                     editor.putBoolean("rating", true);
                     editor.commit();*/
                     object.setNote((int) rating);
+                    new ServerUpdate("note",""+rating,"addNote").execute();
                     new updateOeuvre().execute(object);
 
                 }
@@ -160,6 +172,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                     editor.putBoolean("comment", true);
                     editor.commit();*/
                     object.setCommentaire(String.valueOf(s));
+                    new ServerUpdate("comment",""+String.valueOf(s),"addComment").execute();
                     new updateOeuvre().execute(object);
                 }
 
@@ -493,6 +506,9 @@ FicheFragment extends Fragment implements View.OnClickListener {
             System.out.println("Isnt null anymore"+ numOeuvre);
             oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
             object=oeuvreList.get(0);
+            ArrayList<userObject> userobjects =new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
+            username = userobjects.get(0).getUser();
+            password = userobjects.get(0).getPw();
             System.out.println("ID object = " + object.getId());
             return null;
         }
@@ -503,4 +519,118 @@ FicheFragment extends Fragment implements View.OnClickListener {
             finishUI();
         }
     }
+
+
+    public class ServerUpdate extends AsyncTask<Void, Void, Boolean> {
+
+        String Attribute;
+        String Value;
+        String Request;
+
+        ServerUpdate(String attribute,String value,String request) {
+            Attribute = attribute;
+            Value = value;
+            Request = request;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            if(comm()){
+                return true;}
+            else return false;}
+
+
+
+        protected boolean comm() {
+            boolean success = false;
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            //String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
+            //String url ="www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson";
+            //String jsonStr = sh.makeServiceCall(url);
+            StringBuilder result = new StringBuilder();
+            URL url = null;
+            try {
+                url = new URL(
+                        "http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request="+Request+"&username="+
+                                username+
+                                "&password="+password+"&"+
+                                Attribute+"="+Value+"&"+
+                                "IDOeuvre="+numOeuvre);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                conn.setRequestMethod("GET");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            BufferedReader rd = null;
+            try {
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String line;
+            try {
+                while ((line = rd.readLine()) != null) {
+                    result.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                rd.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String jsonStr = result.toString();
+
+            //Log.e(TAG, "Response from url: " + jsonStr);
+            if (jsonStr != null) {
+                try{
+                    JSONArray oeuvres = new JSONArray("["+jsonStr+"]");
+
+                    JSONObject c = oeuvres.getJSONObject(0);
+                    success =c.getBoolean("successful");
+                    System.out.println("nani"+success);
+
+                }catch (JSONException e) {
+                    e.printStackTrace();
+                }
+/*
+                try {
+                    Writer output = null;
+                    File file = new File(getApplicationContext().getFilesDir() + "OeuvresData.json");
+                    output = new BufferedWriter(new FileWriter(file));
+                    output.write(jsonStr);
+                    output.close();
+                } catch (Exception e) {
+                    Log.e(TAG, "File Saving error: " + e.getMessage());
+                }
+            } else {
+                //Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });*/
+            }
+
+            return success;
+        }
+    }
+
+
 }

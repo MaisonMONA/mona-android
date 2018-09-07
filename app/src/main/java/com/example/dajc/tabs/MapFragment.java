@@ -189,8 +189,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         double art_longi;
         int item_nb = 0;
         OverlayItem myOverlayItem;
-        Drawable artMarker = getResources().getDrawable(R.drawable.ic_pingreen);
-        Drawable artMarker2 = getResources().getDrawable(R.drawable.ic_pinblue);
+        Drawable artMarker = getResources().getDrawable(R.drawable.ic_pinblue);
+        Drawable artMarker2 = getResources().getDrawable(R.drawable.ic_pingreen);
         Drawable artMarker3 = getResources().getDrawable(R.drawable.ic_pingold);
         //dbh = new DBHelper(Activity.this);
         for (int i=0;i<oeuvreList.size();i++)
@@ -274,22 +274,22 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
     private void updateIcone(){
         if(collectionnee){
-            imgcollectionbutton.setImageResource(R.drawable.ic_pingold);
+            imgcollectionbutton.setImageResource(R.drawable.ic_pingoldmenu);
         }
         else{
-            imgcollectionbutton.setImageResource(R.drawable.ic_pingold_gray);
+            imgcollectionbutton.setImageResource(R.drawable.ic_pingoldmenu_gray);
         }
         if(ciblee){
-            imgciblebutton.setImageResource(R.drawable.ic_pinblue);
+            imgciblebutton.setImageResource(R.drawable.ic_pingreen);
         }
         else{
-            imgciblebutton.setImageResource(R.drawable.ic_pinblue_gray);
+            imgciblebutton.setImageResource(R.drawable.ic_pingreen_gray);
         }
         if(nonvisitee){
-            imgnonvisitebutton.setImageResource(R.drawable.ic_pingreen);
+            imgnonvisitebutton.setImageResource(R.drawable.ic_pinblue);
         }
         else{
-            imgnonvisitebutton.setImageResource(R.drawable.ic_pingreen_gray);
+            imgnonvisitebutton.setImageResource(R.drawable.ic_pinblue_gray);
         }
     }
     public void refreshDialog(){
