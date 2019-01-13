@@ -161,7 +161,6 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                     //new ServerUpdate("comment",""+String.valueOf(s),"addComment").execute();
                     new updateOeuvre().execute(object);
                 }
-
             });
         }
         else {

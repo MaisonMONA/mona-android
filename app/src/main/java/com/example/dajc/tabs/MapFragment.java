@@ -162,6 +162,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             Log.d("map", "start set to default location");
         }
         mapController.setCenter(startPoint);
+        map.setMaxZoomLevel(21);
 
         return v;
 
