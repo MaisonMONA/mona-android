@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.dajc.tabs.FicheActivity">
+
+
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        android:contentDescription=""
+        app:layout_constraintBottom_toTopOf="@+id/scrollView3"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="match_parent"
+        android:layout_height="122dp"
+        android:background="@android:color/white"
+        android:fadeScrollbars="false"
+        android:paddingTop="8dp"
+        android:scrollbarSize="5dip"
+        android:scrollbarThumbVertical="@color/Yellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/artiste"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:layout_marginTop="0dp"
+                android:text="nom_artiste"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="22sp"
+                app:layout_constraintBottom_toTopOf="@+id/titre"
+                app:layout_constraintEnd_toEndOf="@+id/titre"
+                app:layout_constraintStart_toStartOf="@+id/titre"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/titre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:text="nom_oeuvre"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="18sp"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toTopOf="@+id/date"
+                app:layout_constraintEnd_toEndOf="@+id/date"
+                app:layout_constraintStart_toStartOf="@+id/date"
+                app:layout_constraintTop_toBottomOf="@+id/artiste" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginStart="0dp"
+                android:text="date_oeuvre"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintBottom_toTopOf="@+id/button_map"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titre" />
+
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="description_oeuvre"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                app:layout_constraintStart_toStartOf="@+id/button_map"
+                app:layout_constraintTop_toBottomOf="@+id/button_map" />
+
+            <EditText
+                android:id="@+id/user_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:contentDescription="Vos impressions"
+                android:hint="Vos impressions"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/tv_date"
+                app:layout_constraintStart_toStartOf="@+id/ratingBar"
+                app:layout_constraintTop_toBottomOf="@+id/tv_date" />
+
+            <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:numStars="5"
+                android:rating="0"
+                android:stepSize="1.0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/button_cam"
+                app:layout_constraintStart_toEndOf="@+id/button_cam"
+                app:layout_constraintTop_toBottomOf="@+id/photo" />
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="0dp"
+                android:gravity="center_vertical|right"
+                android:text="date_photo"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                app:layout_constraintBottom_toTopOf="@+id/user_comment"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/button_cam"
+                app:layout_constraintTop_toBottomOf="@+id/closebtn" />
+
+            <ImageButton
+                android:id="@+id/button_map"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginStart="21dp"
+                android:background="@mipmap/ic_map_active"
+                app:layout_constraintEnd_toStartOf="@+id/button_cam"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/date" />
+
+            <ImageButton
+                android:id="@+id/button_cam"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@android:drawable/ic_menu_camera"
+                app:layout_constraintBottom_toBottomOf="@+id/button_map"
+                app:layout_constraintEnd_toStartOf="@+id/tv_date"
+                app:layout_constraintStart_toEndOf="@+id/button_map"
+                app:layout_constraintTop_toTopOf="@+id/button_map" />
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/map"
+
+                android:layout_width="match_parent"
+                android:layout_height="122dp"
+                android:adjustViewBounds="false"
+                android:baselineAlignBottom="false"
+                android:contentDescription=""
+                tools:layout_editor_absoluteX="-18dp">
+
+            </org.osmdroid.views.MapView>
+        </LinearLayout>
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>
