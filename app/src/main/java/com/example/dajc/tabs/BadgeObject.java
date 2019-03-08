@@ -128,9 +128,9 @@ public class BadgeObject implements Parcelable {
                 '}';
     }
     public static ArrayList<BadgeObject> getBadges(){
-        ArrayList<BadgeObject> badges=new ArrayList<BadgeObject>();
+        ArrayList<BadgeObject> badges = new ArrayList<BadgeObject>();
         badges.add(
-                new BadgeObject("Art décoratifs","Categorie","Arts décoratifs","0",null,null,null,0,3));
+                new BadgeObject("Arts décoratifs","Categorie","Arts décoratifs","0",null,null,null,0,3));
         badges.add(
                 new BadgeObject("Peinture","SousCategorie","Peinture","1",null,null,null,0,3));
         badges.add(
