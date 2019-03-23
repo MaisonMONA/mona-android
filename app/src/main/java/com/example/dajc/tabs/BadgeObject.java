@@ -130,17 +130,22 @@ public class BadgeObject implements Parcelable {
     public static ArrayList<BadgeObject> getBadges(){
         ArrayList<BadgeObject> badges = new ArrayList<BadgeObject>();
         badges.add(
-                new BadgeObject("Arts décoratifs","Categorie","Arts décoratifs","0",null,null,null,0,3));
+                new BadgeObject("Université de Montréal","Quartier","Arts décoratifs","0",null,null,null,0,3));
         badges.add(
-                new BadgeObject("Peinture","SousCategorie","Peinture","1",null,null,null,0,3));
+                new BadgeObject("Hochelaga","Quartier","Peinture","1",null,null,null,0,3));
         badges.add(
-                new BadgeObject("Sculpture","SousCategorie","Sculpture","2",null,null,null,0,5));
+                new BadgeObject("Mont-Royal","Quartier","Sculpture","2",null,null,null,0,5));
         badges.add(
                 new BadgeObject("Côte-des-Neiges-Notre-Dame-de-Grâce","Quartier","Côte-des-Neiges-Notre-Dame-de-Grâce","3",null,null,null,0,3));
         badges.add(
-                new BadgeObject("Université de Montreal","Quartier","Universite de Montreal (Rectorat)","4",null,null,null,0,5));
+                new BadgeObject("Ahuntsic-Cartierville","Quartier","Universite de Montreal (Rectorat)","4",null,null,null,0,5));
         badges.add(
-                new BadgeObject("Louis-Collin","Id","10004","5",null,null,"Louis-Collin",0,1));
+                new BadgeObject("Villeray","Quartier","10004","5",null,null,"Louis-Collin",0,1));
+        badges.add(
+                new BadgeObject("Lachine","Quartier","10004","6",null,null,"test",0,1));
+        badges.add(
+                new BadgeObject("Sud-Ouest","Quartier","Peinture","7",null,null,null,0,3));
         return badges;
+
     }
 }
