@@ -54,26 +54,29 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     static ArrayList<BadgeObject> badgeList = new ArrayList<BadgeObject>();
     public static AppDatabase db;
     public static AppDatabase getDb(){return db;}
-    public boolean logged;
+    public boolean logged = true;
     int users;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.first_activity);
 
         db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "oeuvre-database").build();
-        try {
+                AppDatabase.class, "oeuvre-database").fallbackToDestructiveMigration().build();
+
+        /*try {
             new getlogged().execute().get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
-        }
+        }*/
+/*
         if(users>0)
             logged=true;
         else logged = false;
+*/
         //TODO faire les quatres cas... pour le moment seul trois cas fonctionnent
         if (isNetworkAvailable()) {
             /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
@@ -151,7 +154,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         @Override
         protected Integer doInBackground(Void... voids) {
 
-                users=FirstActivity.getDb().getUserDao().numberofuser();
+            users = FirstActivity.getDb().getUserDao().numberofuser();
             return 1;
         }
     }
@@ -438,5 +441,4 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
         return "erreur de date";
     }
-
 }

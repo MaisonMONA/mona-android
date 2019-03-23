@@ -624,8 +624,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
         protected Void doInBackground(Void... voids) {
             oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
             ArrayList<userObject> userobjects =new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
-            username = userobjects.get(0).getUser();
-            password = userobjects.get(0).getPw();
+//            username = userobjects.get(0).getUser();
+//            password = userobjects.get(0).getPw();
             object=oeuvreList.get(0);
             return null;
         }

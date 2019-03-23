@@ -35,6 +35,9 @@ public class Badge_Activity extends AppCompatActivity {
             R.drawable.center,
             R.drawable.center,
             R.drawable.center,
+            R.drawable.center,
+            R.drawable.center,
+            R.drawable.center,
             R.drawable.center
 
     };

@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "foo@example.com:hello", "bar@example.com:world", "mona"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -84,7 +84,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        password = "1234";
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.Username);
         populateAutoComplete();
@@ -105,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                username =  mEmailView.getText().toString();
+                //username = mEmailView.getText().toString();
                 attemptLogin();
             }
         });
@@ -206,7 +205,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(email);
-                mAuthTask.execute((Void) null);
+            mAuthTask.execute((Void) null);
         }
     }
 

@@ -39,6 +39,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -100,7 +101,9 @@ public class MainActivity extends AppCompatActivity {
         pager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(pager);
         pagerAdapter.setTabIcon();
+        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID); // update de la police du serveur de osm
     }
+    
     public static void MapFrag(int position)
     {
         pager.setCurrentItem(1);
@@ -346,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
             badgeList =new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
             return new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
         }
-    }*/
+    } */
 
 
 }

@@ -517,11 +517,11 @@ FicheFragment extends Fragment implements View.OnClickListener {
         @Override
         protected Void doInBackground(Void... voids) {
             System.out.println("Isnt null anymore"+ numOeuvre);
-            oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
-            object=oeuvreList.get(0);
+            oeuvreList = new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
+            object = oeuvreList.get(0);
             ArrayList<userObject> userobjects =new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
-            username = userobjects.get(0).getUser();
-            password = userobjects.get(0).getPw();
+//            username = userobjects.get(0).getUser();
+//            password = userobjects.get(0).getPw();
             System.out.println("ID object = " + object.getId());
             return null;
         }
