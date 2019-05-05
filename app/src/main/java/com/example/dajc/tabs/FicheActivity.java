@@ -290,7 +290,7 @@ public class FicheActivity extends Activity implements View.OnClickListener {
                 intent = new Intent(this, MapActivity.class);
                 intent.putExtra("numOeuvre", numOeuvre);
                 startActivity(intent);*/
-                MainActivity.MapFrag(0);
+                //MainActivity.MapFrag(0);
 
                 break;
 

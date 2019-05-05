@@ -431,7 +431,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 intent.putExtra("numOeuvre", numOeuvre);
                 intent.putExtra("List", oeuvreList);
                 startActivity(intent);*/
-                MainActivity.MapFrag(0);
+                //MainActivity.MapFrag(0);
                 break;
 
             case R.id.button_cam:float range = 75;//metres

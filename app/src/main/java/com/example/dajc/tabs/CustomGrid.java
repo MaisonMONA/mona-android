@@ -56,6 +56,34 @@ public class CustomGrid extends BaseAdapter {
                 ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
                 imageView.setImageResource(R.drawable.cdn);
             }
+            if(web[position].contains("Hochelaga")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.hoch);
+            }
+            if(web[position].contains("Université de Montréal")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.udm);
+            }
+            if(web[position].contains("Mont-Royal")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.hoch);
+            }
+            if(web[position].contains("Villeray")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.vry);
+            }
+            if(web[position].contains("Ahuntsic-Cartierville")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.ac);
+            }
+            if(web[position].contains("Lachine")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.lach);
+            }
+            if(web[position].contains("Sud-Ouest")){
+                ImageView imageView = (ImageView)grid.findViewById(R.id.grid_image);
+                imageView.setImageResource(R.drawable.so);
+            }
             else{TextView textView = grid.findViewById(R.id.textView6);
                 textView.setText(web[position]);}
             ProgressBar progressBar = (ProgressBar) grid.findViewById(R.id.grid_progressBar);

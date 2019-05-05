@@ -26,6 +26,7 @@ import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +36,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +54,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity{
     static int numOeuvre;
     static int triType;
     //to know which layout to use for Fiche
@@ -77,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Setup of the toolbar
+        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         oeuvreDuJour=true;
         caller="";
         lati=45.508567;;
@@ -89,21 +97,52 @@ public class MainActivity extends AppCompatActivity {
         }
         new getOeuvre().execute();
        // new getBadge().execute();
-        tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        //pager = (ViewPager) findViewById(R.id.pager);
-        //custom pager without swiping
-        pager = findViewById(R.id.pager);
 
-        //pager.setPagingEnabled(false);
+        //Setup of the tabs
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+        tabLayout.addTab(tabLayout.newTab().setText("Oeuvre"));
+        tabLayout.addTab(tabLayout.newTab().setText("Carte"));
+        tabLayout.addTab(tabLayout.newTab().setText("Liste"));
+        tabLayout.addTab(tabLayout.newTab().setText("Galerie"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
 
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        pager.setAdapter(pagerAdapter);
-        tabLayout.setupWithViewPager(pager);
-        pagerAdapter.setTabIcon();
+        final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
+        viewPager.setAdapter(adapter);
+        viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) { viewPager.setCurrentItem(tab.getPosition()); }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) { }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) { }});
+
+
+        //Setup icons on each tab
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            tabLayout.getTabAt(i).setIcon(ICONS[i]);
+        }
+
+        //Potentiellement rajouter ici des icones lorsque on a selectionner l'onglet. Voir: https://github.com/roughike/BottomBar#changing-icons-based-on-selection-state
+
+
         OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID); // update de la police du serveur de osm
     }
-    
+
+    //Array containing tab icons
+    final int[] ICONS = new int[]{
+            R.mipmap.ic_odj_tab,
+            R.mipmap.ic_map_tab,
+            R.mipmap.ic_list_tab,
+            R.mipmap.ic_collection_tab
+
+    };
+
+
+    //Never used. Check later if any relation with map
     public static void MapFrag(int position)
     {
         pager.setCurrentItem(1);
@@ -118,11 +157,12 @@ public class MainActivity extends AppCompatActivity {
 
         pager.setCurrentItem(0);
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         return true;
     }
 
@@ -158,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.dispatchTouchEvent( event );
     }
-
+/*
     public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
         List<Drawable> icons = new ArrayList<Drawable>();
         List<Drawable> iconsHilighted = new ArrayList<>();
@@ -168,13 +208,13 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
             pager.addOnPageChangeListener(this);
 
-            Drawable icon1 =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
+            Drawable icon1 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_odj_final);
             Drawable icon1Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_home_active);
-            Drawable icon2 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_passive);
+            Drawable icon2 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_final);
             Drawable icon2Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_active);
-            Drawable icon3 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_favorite_passive);
+            Drawable icon3 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_listview);
             Drawable icon3Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_favorite_active);
-            Drawable icon4 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_gallery_passive);
+            Drawable icon4 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_collection_final);
             Drawable icon4Hilighted= getApplicationContext().getResources().getDrawable(R.mipmap.ic_gallery_active);
 
             icons.add(icon1);
@@ -231,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
             String titre;
             Drawable drawable;
             if (position == 0) {
-                titre = "Oeuvre du jour";
+                titre = "ODJ";
                 drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
             } else if (position == 1) {
                 titre = "Carte";
@@ -260,12 +300,12 @@ public class MainActivity extends AppCompatActivity {
         /*public CharSequence getPageTitle(int position) {
             return null;
         }
-*/
+
         public void setTabIcon() {
             for(int i = 0; i < icons.size(); i++) {
                 if(i == 0) {
                     //noinspection ConstantConditions
-                    tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
+                    //tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
                 }
                 else {
                     //noinspection ConstantConditions
@@ -299,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
     }
-    public void reload() {
+*/    public void reload() {
         Intent intent = getIntent();
         overridePendingTransition(0, 0);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

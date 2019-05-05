@@ -461,7 +461,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 intent.putExtra("numOeuvre", numOeuvre);
                 intent.putExtra("List", oeuvreList);
                 startActivity(intent);*/
-                MainActivity.MapFrag(0);
+                //MainActivity.MapFrag(0);
                 this.dismiss();
                 break;
 

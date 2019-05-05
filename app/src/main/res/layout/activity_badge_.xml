@@ -162,7 +162,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="1dp"
                         android:background="@android:color/white"
-                        android:text="Quartiers et catégorie"
+                        android:text="Districts"
                         android:textColor="@android:color/black" />
                 </LinearLayout>
 
