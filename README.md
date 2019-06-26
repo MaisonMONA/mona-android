@@ -6,6 +6,14 @@ git clone 'nom du repertoire'
 
 creer une branche local android-matija et synchroniser
 
+```bash
 git checkout android-matija
+```
+
+```bash
 git fetch
+```
+
+```bash
 git pull origin android-matija
+```
