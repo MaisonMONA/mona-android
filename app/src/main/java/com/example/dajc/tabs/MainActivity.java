@@ -11,14 +11,9 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Handler;
+
+import androidx.appcompat.app.*;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.DynamicDrawableSpan;
@@ -38,6 +33,8 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.google.android.material.tabs.TabLayout;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,6 +50,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import androidx.appcompat.widget.*;
+import androidx.viewpager.widget.ViewPager;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -76,13 +76,15 @@ public class MainActivity extends AppCompatActivity{
     static Permissions Permission;
     static OnSwipeTouchListener onSwipeTouchListener;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //Setup of the toolbar
-        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         oeuvreDuJour=true;
@@ -100,14 +102,14 @@ public class MainActivity extends AppCompatActivity{
 
         //Setup of the tabs
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Oeuvre"));
+        tabLayout.addTab(tabLayout.newTab().setText("Œuvre du jour"));
         tabLayout.addTab(tabLayout.newTab().setText("Carte"));
-        tabLayout.addTab(tabLayout.newTab().setText("Liste"));
-        tabLayout.addTab(tabLayout.newTab().setText("Galerie"));
+        tabLayout.addTab(tabLayout.newTab().setText("Œuvres"));
+        tabLayout.addTab(tabLayout.newTab().setText("Collection"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
 
-        final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity{
         //Potentiellement rajouter ici des icones lorsque on a selectionner l'onglet. Voir: https://github.com/roughike/BottomBar#changing-icons-based-on-selection-state
 
 
-        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID); // update de la police du serveur de osm
+        //OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID); // update de la police du serveur de osm
     }
 
     //Array containing tab icons
@@ -347,6 +349,10 @@ public class MainActivity extends AppCompatActivity{
         overridePendingTransition(0, 0);
         startActivity(intent);
     }
+    /* MIT EN COMMENTAIRE LE 12 OCTOBRE 2019
+
+        UTILE ??
+
     public class CustomViewPager extends android.support.v4.view.ViewPager{
         private boolean enabled;
 
@@ -374,6 +380,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
     }
+    */
     private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
 
 

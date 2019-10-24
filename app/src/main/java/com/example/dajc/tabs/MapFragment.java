@@ -19,11 +19,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +27,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -43,8 +43,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -66,7 +65,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
     GeoPoint startPoint;
     MapView map;
     GeoPoint myLocation;
-    ResourceProxy mResourceProxy;
+    //ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
     ArrayList<OeuvreObject> oeuvreList = new ArrayList<>();
@@ -154,15 +153,15 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         //set the start point to user last known location or to mtl
         mtl_lati = 45.508567;
         mtl_longi = -73.566455;
-        if (lati != 0 && longi != 0) {
-            startPoint = new GeoPoint(lati, longi);
-            Log.d("map", "start set to phone location");
-        } else {
+
+           // startPoint = new GeoPoint(lati, longi);
+           // Log.d("map", "start set to phone location");
+
             startPoint = new GeoPoint(mtl_lati, mtl_longi);
             Log.d("map", "start set to default location");
-        }
+
         mapController.setCenter(startPoint);
-        map.setMaxZoomLevel(21);
+        map.setMaxZoomLevel(21.0);
 
         return v;
 
@@ -191,12 +190,13 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         double art_longi;
         int item_nb = 0;
         OverlayItem myOverlayItem;
+        //Icone sur la map
         Drawable artMarker = getResources().getDrawable(R.drawable.ic_pinblue);
         Drawable artMarker2 = getResources().getDrawable(R.drawable.ic_pingreen);
         Drawable artMarker3 = getResources().getDrawable(R.drawable.ic_pingold);
+
         //dbh = new DBHelper(Activity.this);
-        for (int i=0;i<oeuvreList.size();i++)
-        {
+        for (int i = 0; i < oeuvreList.size() ; i++) {
             title = oeuvreList.get(i).getTitre();
             idItem = oeuvreList.get(i).getId();
             art_lati = oeuvreList.get(i).getLocationX();
@@ -209,19 +209,17 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 myOverlayItem.setMarker(artMarker3);
                 items.add(myOverlayItem);
             }
-            else if (oeuvreList.get(i).getEtat()==1&&ciblee)
-        {
-            myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
-            myOverlayItem.setMarker(artMarker2);
-            items.add(myOverlayItem);
-        }
+            else if (oeuvreList.get(i).getEtat()==1&&ciblee) {
+                myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
+                myOverlayItem.setMarker(artMarker2);
+                items.add(myOverlayItem);
+            }
             else if(nonvisitee){
                 //System.out.println(oeuvreList.get(i).getEtat());
                 //System.out.println("this is an ID "+ idItem);
                 myOverlayItem = new OverlayItem(idItem, title, artist, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker);
                 items.add(myOverlayItem);
-
             }
             item_nb++;
         }
@@ -246,7 +244,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
                 /*MainActivity.oeuvreDuJour=false;
                 MainActivity.listFrag(Integer.parseInt(item.getUid()));*/
                 //new changeFrag().execute((index));
-                MainActivity.numOeuvre= Integer.parseInt(item.getUid());
+                MainActivity.numOeuvre = Integer.parseInt(item.getUid());
                 if(oeuvreList.get(index).getEtat()==2){
                     MainActivity.withImg=false;
                 }
@@ -263,11 +261,11 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
         };
 
-        mResourceProxy = new DefaultResourceProxyImpl(getContext());
+        //mResourceProxy = getContext();
         //the overlay
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay
-                , mResourceProxy);
-        mOverlay.setFocusItemsOnTap(true);
+        //ItemizedOverlayWithFocus(List<Item> aList, ItemizedIconOverlay.OnItemGestureListener<Item> aOnItemTapListener, Context pContext)
+        ItemizedIconOverlay<OverlayItem> mOverlay = new ItemizedOverlayWithFocus(items, iOverlay, getContext());
+        //ItemizedIconOverlay<OverlayItem> mOverlay = new ItemizedIconOverlay<OverlayItem>(items);
         map.getOverlays().add(mOverlay);
 
 
@@ -350,7 +348,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         Drawable personMarker = getResources().getDrawable(R.mipmap.ic_map_person);
         overlayL = new ItemizedIconOverlay<OverlayItem>(
                 new ArrayList<OverlayItem>(), personMarker, null,
-                new DefaultResourceProxyImpl(getActivity()));
+                getContext());
         // gc: last GeoPoint
         //remove last Marker
 

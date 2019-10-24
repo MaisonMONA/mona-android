@@ -6,16 +6,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-
     tools:context="com.example.dajc.tabs.MainActivity">
 
-
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/MonaToolbar">
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:minHeight="?attr/actionBarSize">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,32 +22,31 @@
         </TextView>
 
 
-
-    </android.support.v7.widget.Toolbar>
-
+    </androidx.appcompat.widget.Toolbar>
 
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tablayout"
+        style="@style/MonaToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="@style/MonaToolbar"
-
         android:fillViewport="true"
+        android:minHeight="?attr/actionBarSize"
         app:tabIndicatorColor="@color/Yellow"
         app:tabIndicatorHeight="5dp"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/black"
-        app:tabTextColor="@color/grey"
-       >
+        app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
+        app:tabTextColor="@color/grey">
+
     </android.support.design.widget.TabLayout>
 
 
-    <android.support.v4.view.ViewPager
+    <com.example.dajc.tabs.NonSwipeableViewPager
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:id="@+id/pager">
+    </com.example.dajc.tabs.NonSwipeableViewPager>
 
-    </android.support.v4.view.ViewPager>
+
 </LinearLayout>

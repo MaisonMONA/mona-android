@@ -5,18 +5,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
+import androidx.core.app.ActivityCompat;
+
+import org.osmdroid.*;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -26,7 +27,6 @@ import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
-
 /**
  * Created by LenaMK on 20/04/2016.
  */
@@ -34,7 +34,7 @@ public class MapActivity extends Activity implements LocationListener {
 
     MapView map;
     IMapController mapController;
-    ResourceProxy mResourceProxy;
+    //ResourceProxy mResourceProxy;
     GeoPoint startPoint;
     int numOeuvre;
     double lati;
@@ -124,11 +124,8 @@ public class MapActivity extends Activity implements LocationListener {
 
         };
 
-        mResourceProxy = new DefaultResourceProxyImpl(this);
-
         //the overlay
-        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay
-                , mResourceProxy);
+        ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay, this);
         mOverlay.setFocusItemsOnTap(true);
         map.getOverlays().add(mOverlay);
 
@@ -174,7 +171,7 @@ public class MapActivity extends Activity implements LocationListener {
         OverlayItem item;
         ItemizedIconOverlay<OverlayItem> overlay= new ItemizedIconOverlay<OverlayItem>(
                 new ArrayList<OverlayItem>(), personMarker, null,
-                new DefaultResourceProxyImpl(this));;
+                this);
 
         if (marker_personne == 0) {
             // gc: last GeoPoint

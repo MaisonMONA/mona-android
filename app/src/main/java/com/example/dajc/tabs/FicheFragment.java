@@ -11,9 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,11 +25,13 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -99,7 +99,6 @@ FicheFragment extends Fragment implements View.OnClickListener {
     GeoPoint startPoint;
     MapView map;
     GeoPoint myLocation;
-    ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
     int idDuJour;
@@ -116,16 +115,16 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("Onceate");
         Calendar calendar = Calendar.getInstance();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         Random rand = new Random(dayOfYear);
-        int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
-        numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
+        //int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
+        //numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
         oeuvreList = FirstActivity.getOeuvreList();
         View v;
-        if(oeuvreList.get(idDuJour).getURI().equals("")){
-            v = inflater.inflate(R.layout.fiche_noimg2, container, false);
+
+        if(false || oeuvreList.get(idDuJour).getURI().equals("")){
+            v = inflater.inflate(R.layout.fiche_noimg2_test, container, false);
             fav_b = (ImageButton) v.findViewById(R.id.button_fav);
             fav_b.setOnClickListener(this);
 
@@ -312,9 +311,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
                 }
 
             };
-            mResourceProxy = new DefaultResourceProxyImpl(getContext());
-            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay
-                    , mResourceProxy);
+            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay, getContext());
             mOverlay.setFocusItemsOnTap(true);
             map.getOverlays().add(mOverlay);
             startPoint = new GeoPoint(art_lati, art_longi);
@@ -517,14 +514,17 @@ FicheFragment extends Fragment implements View.OnClickListener {
         @Override
         protected Void doInBackground(Void... voids) {
             System.out.println("Isnt null anymore"+ numOeuvre);
-            oeuvreList = new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
+            //TODO: etudier le path de FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre))
+            //Ligne suivante a ete enlever/mit en commentaire car elle ne va chercher rien
+            //oeuvreList = new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().verifyID(String.valueOf(numOeuvre)));
             object = oeuvreList.get(0);
-            ArrayList<userObject> userobjects =new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
+            ArrayList<userObject> userobjects = new ArrayList<userObject>(FirstActivity.getDb().getUserDao().getUser());
 //            username = userobjects.get(0).getUser();
 //            password = userobjects.get(0).getPw();
-            System.out.println("ID object = " + object.getId());
+           // System.out.println("ID object = " + object.getId());
             return null;
         }
+
 
         @Override
         protected void onPostExecute(Void aVoid) {

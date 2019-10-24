@@ -1,15 +1,18 @@
 package com.example.dajc.tabs;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 
 /**
  * Created by emile on 2018-02-06.
  */
-@Entity (tableName = "user")
+@Entity(tableName = "user")
 public class userObject implements Parcelable {
     @PrimaryKey
     @NonNull

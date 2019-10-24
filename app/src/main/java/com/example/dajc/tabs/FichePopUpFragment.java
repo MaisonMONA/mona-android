@@ -4,10 +4,7 @@ import android.annotation.TargetApi;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,11 +31,12 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.DialogFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -108,7 +106,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
     GeoPoint startPoint;
     MapView map;
     GeoPoint myLocation;
-    ResourceProxy mResourceProxy;
+    //ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
     String username;
@@ -344,9 +342,8 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 }
 
             };
-            mResourceProxy = new DefaultResourceProxyImpl(getContext());
-            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay
-                    , mResourceProxy);
+            //mResourceProxy = new DefaultResourceProxyImpl(getContext());
+            ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay, getContext());
             mOverlay.setFocusItemsOnTap(true);
             map.getOverlays().add(mOverlay);
             startPoint = new GeoPoint(art_lati, art_longi);
@@ -392,7 +389,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 new updateOeuvre().execute(object);
                 MainActivity.withImg=true;
                 if(MainActivity.caller.equals("List")){
-                ListViewFragment frag = (ListViewFragment) getTargetFragment();
+                ListViewFragment frag =  (ListViewFragment) getTargetFragment();
                 if(frag != null){
                     frag.refreshDialog();
                 }}

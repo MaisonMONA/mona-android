@@ -3,13 +3,19 @@
     <style name="MonaToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@color/white</item>
         <item name="actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="android:text">MONA</item>
-        <item name="android:textColor">@color/grey</item>
-        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">@color/magenta</item>
+        <item name="android:textSize">50dp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@color/grey</item>
     </style>
 
+    <style name="AppFullScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

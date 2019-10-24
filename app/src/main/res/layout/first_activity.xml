@@ -3,12 +3,12 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-    <ImageView
+
+    <pl.droidsonroids.gif.GifImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/firstactivitybackground"
-        android:scaleType = "centerCrop"
-        />
+        android:src="@drawable/splash_anim"
+        android:scaleType="fitXY"/>
 
 
 </LinearLayout>

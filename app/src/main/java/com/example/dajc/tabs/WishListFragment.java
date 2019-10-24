@@ -3,14 +3,16 @@ package com.example.dajc.tabs;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 //TODO fix the wishlist
 /**
  * Created by DAJC on 2016-04-21.

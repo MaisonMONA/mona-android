@@ -1,10 +1,14 @@
 package com.example.dajc.tabs;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+
+import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -12,16 +16,18 @@ import java.util.ArrayList;
 /**
  * Created by emile on 2018-02-06.
  */
-@Entity (tableName = "badge")
+@Entity(tableName = "badge")
 public class BadgeObject implements Parcelable {
 
     public String Titre;
-    @PrimaryKey @NonNull public String Id;
+    @PrimaryKey
+    @NonNull
+    public String Id;
     public String Name;
     public int Progress;
     public int Objective;
-    public String LogoNoColor;
-    public String LogoWithColor;
+    public int LogoNoColor;
+    public int LogoWithColor;
     public String Commentaire;
     public String Condition;
     public String ConditionValue;
@@ -38,10 +44,10 @@ public class BadgeObject implements Parcelable {
     public int getObjective() {
         return Objective;
     }
-    public String getLogoNoColor() {
+    public int getLogoNoColor() {
         return LogoNoColor;
     }
-    public String getLogoWithColor() {
+    public int getLogoWithColor() {
         return LogoWithColor;
     }
     public String getCommentaire() {
@@ -61,7 +67,7 @@ public class BadgeObject implements Parcelable {
 
     public BadgeObject(){};
 
-    public BadgeObject(String titre, String condition, String conditionval, String id, String logoWithColor, String logoNoColor, String commentaire, int progress, int objective) {
+    public BadgeObject(String titre, String condition, String conditionval, String id, int logoWithColor, int logoNoColor, String commentaire, int progress, int objective) {
         this.Titre = titre;
         this.Id = id;
         this.LogoNoColor = logoNoColor;
@@ -85,8 +91,8 @@ public class BadgeObject implements Parcelable {
     public BadgeObject(Parcel in){
         this.Progress = in.readInt();
         this.Objective = in.readInt();
-        this.LogoWithColor = in.readString();
-        this.LogoNoColor = in.readString();
+        this.LogoWithColor = in.readInt();
+        this.LogoNoColor = in.readInt();
         this.Id = in.readString();
         this.Titre = in.readString();
         this.Commentaire = in.readString();
@@ -104,8 +110,8 @@ public class BadgeObject implements Parcelable {
         dest.writeInt(this.Progress);
         dest.writeInt(this.Objective);
         dest.writeString(this.Id);
-        dest.writeString(this.LogoWithColor);
-        dest.writeString(this.LogoNoColor);
+        dest.writeInt(this.LogoWithColor);
+        dest.writeInt(this.LogoNoColor);
         dest.writeString(this.Titre);
         dest.writeString(this.Commentaire);
         dest.writeString(this.Condition);
@@ -129,22 +135,23 @@ public class BadgeObject implements Parcelable {
     }
     public static ArrayList<BadgeObject> getBadges(){
         ArrayList<BadgeObject> badges = new ArrayList<BadgeObject>();
+        //Resources res = getResources();
         badges.add(
-                new BadgeObject("Université de Montréal","Quartier","Arts décoratifs","0",null,null,null,0,3));
+                new BadgeObject("Université de Montréal","Quartier","Universite de Montreal (Rectorat)","0",R.drawable.udm_color,R.drawable.udm,null,0,0));
         badges.add(
-                new BadgeObject("Hochelaga","Quartier","Peinture","1",null,null,null,0,3));
+                new BadgeObject("Hochelaga","Quartier","Hochelaga","1",R.drawable.hoch_color,R.drawable.hoch,null,0,3));
         badges.add(
-                new BadgeObject("Mont-Royal","Quartier","Sculpture","2",null,null,null,0,5));
+                new BadgeObject("Mont-Royal","Quartier","Mont-Royal","2",R.drawable.mr_color,R.drawable.mr,null,0,5));
         badges.add(
-                new BadgeObject("Côte-des-Neiges-Notre-Dame-de-Grâce","Quartier","Côte-des-Neiges-Notre-Dame-de-Grâce","3",null,null,null,0,3));
+                new BadgeObject("Côte-des-Neiges-Notre-Dame-de-Grâce","Quartier","Côte-des-Neiges-Notre-Dame-de-Grâce","3", R.drawable.cdn_color , R.drawable.cdn,null,0,0));
         badges.add(
-                new BadgeObject("Ahuntsic-Cartierville","Quartier","Universite de Montreal (Rectorat)","4",null,null,null,0,5));
+                new BadgeObject("Ahuntsic-Cartierville","Quartier","Ahuntsic-Cartierville","4",R.drawable.ac_color,R.drawable.ac,null,0,5));
         badges.add(
-                new BadgeObject("Villeray","Quartier","10004","5",null,null,"Louis-Collin",0,1));
+                new BadgeObject("Villeray","Quartier","Villeray","5",R.drawable.vry_color,R.drawable.vry,null,0,1));
         badges.add(
-                new BadgeObject("Lachine","Quartier","10004","6",null,null,"test",0,1));
+                new BadgeObject("Lachine","Quartier","Lachine","6",R.drawable.lach_color,R.drawable.lach,null,0,1));
         badges.add(
-                new BadgeObject("Sud-Ouest","Quartier","Peinture","7",null,null,null,0,3));
+                new BadgeObject("Sud-Ouest","Quartier","Sud-Ouest","7",R.drawable.so_color,R.drawable.so,null,0,3));
         return badges;
 
     }

@@ -1,18 +1,22 @@
 package com.example.dajc.tabs;
 
 import android.app.Activity;
-import android.arch.persistence.room.Room;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.room.Room;
+
+import com.example.dajc.tabs.WebAPI.Artiste;
 import com.example.dajc.tabs.WebAPI.RunAPI;
 
 import org.json.JSONArray;
@@ -35,6 +39,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
@@ -54,14 +59,29 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     static ArrayList<BadgeObject> badgeList = new ArrayList<BadgeObject>();
     public static AppDatabase db;
     public static AppDatabase getDb(){return db;}
-    public boolean logged = true;
+    public boolean logged;
     int users;
+
+    /** Duration of wait **/
+    //private final int SPLASH_DISPLAY_LENGTH = 5000; //splash screen will be shown for 2 seconds
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_activity);
+/*
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
+                Intent mainIntent = new Intent(FirstActivity.this, MainActivity.class);
+                startActivity(mainIntent);
+                finish();
+
+            }
+        }, SPLASH_DISPLAY_LENGTH);
+*/
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "oeuvre-database").fallbackToDestructiveMigration().build();
 
@@ -72,11 +92,11 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         } catch (ExecutionException e) {
             e.printStackTrace();
         }*/
-/*
+
         if(users>0)
             logged=true;
         else logged = false;
-*/
+
         //TODO faire les quatres cas... pour le moment seul trois cas fonctionnent
         if (isNetworkAvailable()) {
             /*if (fileExist((getApplicationContext().getFilesDir() + "OeuvresData.json")))
@@ -177,7 +197,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             StringBuilder result = new StringBuilder();
             URL url = null;
             try {
-                url = new URL("http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson1");
+                url = new URL("https://picasso.iro.umontreal.ca/~mona/api/artworks");
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -198,6 +218,8 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            //parsing deja fait
             String line;
             try {
                 while ((line = rd.readLine()) != null) {
@@ -297,64 +319,125 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         if (jsonStr != null) {
             try {
                 // Getting JSON Array node
-                JSONArray oeuvres = new JSONArray(jsonStr);
-                System.out.println(jsonStr.length());
+                JSONObject oeuvres_data = new JSONObject(jsonStr);
+                JSONArray oeuvres = oeuvres_data.getJSONArray("data");
 
                 // looping through All Contacts
                 for (int i = 0; i < oeuvres.length(); i++) {
+
                     JSONObject c = oeuvres.getJSONObject(i);
-                    String id =c.getString("id");
+
+                    String id = c.getString("id");
+
                     if (db.getOeuvreDao().verifyID(id).isEmpty()) {
                         //System.out.println("not in bd");
-                        String titre = c.getString("Titre");
-                        if (titre.equals("null")&&Integer.parseInt(id)>999){
-                            titre= "Non Titré (murale peinte)";
+
+                        //titre
+                        String title = c.getString("title");
+                        if (title.equals("null")){
+                            title = "sans nom";
                         }
-                        else if(titre.equals("null")){
-                            titre= "Non Titré";
-                        }
-                        String date = c.getString("Date");
-                        if (date.equals("null")||date.equals(""))
+
+                        //produced at
+                        String produced_at = c.getString("produced_at");
+                        if (produced_at.equals("null") || produced_at.equals(""))
                         {
-                            date="Date inconnue";
+                            produced_at = "NA";
                         }
-                        else {
-                            date = treatDate(date);
+
+                        //category
+                        JSONObject category_object = c.getJSONObject("category");
+                        String category_fr = category_object.getString("fr");
+                        String category_en = category_object.getString("en");
+
+
+                        //subcategory
+                        String subcategory_fr = "NA";
+                        String subcategory_en = "NA";
+                        if(!c.isNull("subcategory")){
+                            JSONObject subcategory_object = c.getJSONObject("subcategory");
+                            subcategory_fr = subcategory_object.getString("fr");
+                            subcategory_en = subcategory_object.getString("en");
                         }
-                        //Calendar date = ((Calendar) c.getDouble("DateFinProduction"));
-                        String materiaux  = c.getString("Materiaux");
-                        if (!materiaux .equals("null")){
-                        JSONArray materiauxArray = c.getJSONArray("Materiaux");
-                        materiaux = treatTechnique(materiauxArray);}
-                        else{
-                            materiaux="";
+
+
+                        //dimension
+                        String dimensions = c.getString("dimensions");
+                        if (!dimensions.equals("[]")){
+                            JSONArray dimension_array = c.getJSONArray("dimensions");
+                            for (int k = 0; k < dimension_array.length(); k++){
+                                if(k < dimension_array.length() - 1){
+                                    dimensions += dimension_array.get(k) + "*";
+                                } else {
+                                    dimensions += dimension_array.get(k) + " cm";
+                                }
+                            }
+                        } else {
+                            dimensions = "NA";
                         }
-                        /*if (materiaux.equals("")){
-                            JSONArray techniqueArray = c.getJSONArray("Technique");
-                            materiaux = treatTechnique(techniqueArray);}*/
-                        //Rajouter le colet quartier dans le fichier JSON
-                        String categorie = c.getString("Categorie");
-                        String sousCategorie = c.getString("SousCategorie");
-                        String quartier = c.getString("Arrondissement");
-                        String dimension = c.getString("Dimension");
-                        if (dimension.equals("null")){
-                            dimension="";
+
+
+
+                        //materials
+                        String materials  = c.getString("materials");
+                        if (!materials.equals("null")){
+                            JSONArray materials_array  = c.getJSONArray("materials");
+                            materials = treatTechnique(materials_array);
+                        } else{
+                            materials = "NA";
                         }
-                        String technique = c.getString("Technique");
-                        if (!technique.equals("null")){
-                        JSONArray techniqueArray = c.getJSONArray("Technique");
-                        technique = treatTechnique(techniqueArray);}
-                        else{
-                            technique="";
+
+
+
+                        //techniques
+                        String techniques  = c.getString("techniques");
+                        if (!techniques.equals("null")){
+                            JSONArray techniques_array  = c.getJSONArray("techniques");
+                            techniques = treatTechnique(techniques_array);
+                        } else{
+                            techniques = "NA";
                         }
-                        JSONArray artisteArray = c.getJSONArray("Artiste");
-                        JSONObject artisteinfo = artisteArray.getJSONObject(0);
-                        String artiste_nom = artisteinfo.getString("Nom");
-                        String artiste_id = artisteinfo.getString("ID");
-                        String artiste_prenom = artisteinfo.getString("Prenom");
-                        String artiste_collectif = artisteinfo.getString("NomCollectif");
-                        double locX = c.getDouble("Latitude");
-                        double locY = c.getDouble("Longitude");
+
+                        //borough
+                        String borough = c.getString("borough");
+
+                        //location
+                        JSONObject location_object = c.getJSONObject("location");
+                        String lat_string = location_object.getString("lat");
+                        String lng_string = location_object.getString("lng");
+                        double lat = Double.parseDouble(lat_string);
+                        double lng = Double.parseDouble(lng_string);
+
+
+
+                        //A changer lorsque nous aurons artisteDAO
+
+                        //On va uniquement chercher le premier artiste
+                        JSONArray artists_array = c.getJSONArray("artists");
+                        JSONObject temp_artist_info = (JSONObject) artists_array.get(0);
+                        String artist_id = temp_artist_info.getString("id");
+                        String artist_name = temp_artist_info.getString("name");
+                        Boolean artist_collective = Boolean.parseBoolean(temp_artist_info.getString("collective"));
+
+
+                        //Oeuvre uniquement en francais
+                        OeuvreObject oeuvre = new OeuvreObject(title, id, category_fr, subcategory_fr, artist_name, produced_at, materials, lat, lng, 0, "", "", -1, borough, dimensions, techniques);
+
+                        /*
+                        JSONArray artists_array = c.getJSONArray("artists");
+                        LinkedList<String[]> artists_list = new LinkedList();
+                        for(int k = 0; k < artists_array.length(); k++){
+                            JSONObject temp_artist_info = (JSONObject) artists_array.get(k);
+
+                            String artist_id = temp_artist_info.getString("id");
+                            String artist_name = temp_artist_info.getString("name");
+                            Boolean artist_collective = Boolean.parseBoolean(temp_artist_info.getString("collective"));
+
+
+                        }
+                        */
+
+                        /*
                         ArtisteObject artiste;
                         OeuvreObject oeuvre;
                         if (artiste_collectif.equals("null")) {
@@ -381,7 +464,10 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                         }
                         //OeuvreObject oeuvre = new OeuvreObject(titre, id, artiste_prenom+ " "+artiste_nom, date, materiaux, locX, locY, 0, "", "", -1, quartier, dimension, technique);
                         //artiste.addOeuvres(oeuvre);
+                        */
                         db.getOeuvreDao().insertAll(oeuvre);
+                        //oeuvreList.add(oeuvre);
+
                     }
                     else{
                         //System.out.println("Already in bd");
@@ -411,15 +497,17 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
         return list;
     }
+
+
+
+
     public String treatTechnique(JSONArray s) throws JSONException {
             String list = "";
-            for(int i = 0 ; i < s.length() ; i++){
-                if (i<s.length()-1){
-                    list+=s.getJSONObject(i).getString("Nom")+", ";
-                }
-                else {
-                    list += s.getJSONObject(i).getString("Nom");
-                }
+            for(int i = 0 ; i < s.length(); i++){
+
+                JSONObject object = s.getJSONObject(i);
+                String word = object.getString("fr");
+                list += word;
             }
             return list;
     }
