@@ -1,5 +1,6 @@
 package com.example.dajc.tabs;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +23,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -55,15 +58,24 @@ public class RegisterActivity extends AppCompatActivity {
                     System.out.println(response);
 
                     JSONObject reader = new JSONObject(response);
-                    if(reader.getBoolean("token")){
-
+                    if(reader.has("token")){
+                        Intent intent = new Intent(getBaseContext(), LoginActivity2.class);
+                        intent.putExtra(EXTRA_MESSAGE, "Yess!");
+                        startActivity(intent);
                     }
-                    if(reader.getBoolean("message")){
+                    if(reader.has("errors")){
                         JSONObject errors = reader.getJSONObject("errors");
-                        if(errors.getBoolean("username")){
-
-                        } else if(errors.getBoolean("password")){
-
+                        if(errors.has("username")){
+                            mError_message.setText("Le nom d'usager n'est pas disponible");
+                            mError_message.setVisibility(View.VISIBLE);
+                        } else if(errors.has("password")){
+                            JSONArray password = errors.getJSONArray("password");
+                            String words = "";
+                            for (int i = 0; i < password.length(); i++){
+                                words += (password.get(i) + "\n");
+                            }
+                            mError_message.setText(words);
+                            mError_message.setVisibility(View.VISIBLE);
                         }
 
                     }

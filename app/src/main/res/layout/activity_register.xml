@@ -48,6 +48,7 @@
         android:layout_height="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:inputType="textPassword"
         android:background="@drawable/edittextround" />
 
     <TextView
@@ -64,6 +65,7 @@
         android:layout_height="30dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:inputType="textPassword"
         android:background="@drawable/edittextround" />
 
     <Button
