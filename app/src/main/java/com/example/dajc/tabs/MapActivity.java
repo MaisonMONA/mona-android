@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import org.osmdroid.*;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -64,6 +65,13 @@ public class MapActivity extends Activity implements LocationListener {
         numOeuvre = intent.getIntExtra("numOeuvre",0);
         OeuvreObject oeuvre = FirstActivity.getOeuvreList().get(numOeuvre);
 
+        //Pour ajouter configurer les donnees par defauts de osmdroid
+        //E/OsmDroid: Please configure a relevant user agent; current value is: osmdroid
+        //https://github.com/osmdroid/osmdroid/blob/ae026862fe4666ab6c8d037b9e2f8805233c8ebf/osmdroid-android/src/main/java/org/osmdroid/config/DefaultConfigurationProvider.java#L306
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+
+        //TODO: Simplifier le tout https://github.com/osmdroid/osmdroid/blob/ae026862fe4666ab6c8d037b9e2f8805233c8ebf/osmdroid-android/src/main/java/org/osmdroid/config/DefaultConfigurationProvider.java#L306
+
         titre = oeuvre.getTitre();
         etat = oeuvre.getEtat();
         noOeuvre = oeuvre.getId();
@@ -83,7 +91,7 @@ public class MapActivity extends Activity implements LocationListener {
         mapController.setZoom(15);
 
         // localisation
-        LocationManager locm = (LocationManager)this. getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Pas de permission", Toast.LENGTH_LONG).show();

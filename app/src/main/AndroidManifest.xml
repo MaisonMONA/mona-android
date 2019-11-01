@@ -52,7 +52,9 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ListViewActivity" />
         <activity android:name=".PreferencesActivity" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/TabAppTheme"/>
         <activity android:name=".InfoActivity" />
         <activity android:name=".PhotoActivity" />
         <activity android:name=".Badge_Activity" />

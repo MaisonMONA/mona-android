@@ -133,7 +133,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
         else if(oeuvreList.size()>0){
             System.out.println("nani1");
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
             startActivity(intent);}
 
     }
@@ -165,7 +165,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             }
             else{
                 System.out.println("nani2");
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
                 intent.putExtra("OeuvreList", oeuvreList);
                 startActivity(intent);}
         }
@@ -273,7 +273,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 startActivity(intent);}
             else{
                 System.out.println("nani3");
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
                 intent.putExtra("OeuvreList", oeuvreList);
                 startActivity(intent);}
             /*String param = "?Authorization=" + "allo";

@@ -129,9 +129,6 @@ public class MainActivity extends AppCompatActivity{
         }
 
         //Potentiellement rajouter ici des icones lorsque on a selectionner l'onglet. Voir: https://github.com/roughike/BottomBar#changing-icons-based-on-selection-state
-
-
-        //OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID); // update de la police du serveur de osm
     }
 
     //Array containing tab icons

@@ -45,6 +45,7 @@ import com.google.android.gms.tasks.Task;
 
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -101,6 +102,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         collectionnee=true;
         nonvisitee=true;
         v = inflater.inflate(R.layout.map_frag_layout, container, false);
+
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         locationButton = (ImageButton) v.findViewById(R.id.button_location);
         locationButton.setOnClickListener(this);

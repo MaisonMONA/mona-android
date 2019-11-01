@@ -1,6 +1,8 @@
 package com.example.dajc.tabs;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -59,7 +61,14 @@ public class RegisterActivity extends AppCompatActivity {
 
                     JSONObject reader = new JSONObject(response);
                     if(reader.has("token")){
-                        Intent intent = new Intent(getBaseContext(), LoginActivity2.class);
+                        String token = reader.getString("token");
+
+                        //https://stackoverflow.com/questions/51596544/save-access-token-via-shared-preferences-android
+                        //to save token
+                        SharedPreferences preferences = getSharedPreferences("MY_APP", Context.MODE_PRIVATE);
+                        preferences.edit().putString("TOKEN",token).apply();
+
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.putExtra(EXTRA_MESSAGE, "Yess!");
                         startActivity(intent);
                     }
