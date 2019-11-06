@@ -60,6 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
                     System.out.println(response);
 
                     JSONObject reader = new JSONObject(response);
+
                     if(reader.has("token")){
                         String token = reader.getString("token");
 

@@ -40,6 +40,14 @@
         android:gravity="center"
         android:background="@drawable/edittextround"/>
 
+    <TextView
+        android:id="@+id/error_message_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textColor="@color/red"
+        android:visibility="invisible" />
+
     <Button
         android:id="@+id/bouton_log"
         android:layout_width="wrap_content"
