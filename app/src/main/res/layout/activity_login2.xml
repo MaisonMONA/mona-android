@@ -20,25 +20,25 @@
 
     <EditText
         android:id="@+id/nomusager"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_width="373dp"
+        android:layout_height="35dp"
+        android:layout_marginVertical="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginVertical="10dp"
-        android:hint="nom d'usager"
+        android:background="@drawable/edittextround"
         android:gravity="center"
-        android:background="@drawable/edittextround"/>
+        android:hint="nom d'usager" />
 
     <EditText
         android:id="@+id/motdepasse"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_width="373dp"
+        android:layout_height="37dp"
+        android:layout_marginVertical="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginVertical="10dp"
-        android:hint="mot de passe"
+        android:background="@drawable/edittextround"
         android:gravity="center"
-        android:background="@drawable/edittextround"/>
+        android:hint="mot de passe" />
 
     <TextView
         android:id="@+id/error_message_login"
@@ -50,31 +50,27 @@
 
     <Button
         android:id="@+id/bouton_log"
-        android:layout_width="wrap_content"
+        android:layout_width="359dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="log moi"
-        android:textSize="20dp"
-        android:textColor="@color/black"
-
+        android:layout_marginVertical="20dp"
+        android:text="@string/log_moi"
         android:textAllCaps="false"
 
-        android:layout_marginVertical="20dp"/>
+        android:textColor="@color/black"
+
+        android:textSize="20dp" />
 
     <Button
         android:id="@+id/new_account"
-        android:layout_width="wrap_content"
-        android:clickable="true"
+        android:layout_width="359dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="creer un compte"
-        android:textSize="15dp"
+        android:layout_marginVertical="20dp"
+        android:clickable="true"
+        android:text="@string/creer_un_compte"
         android:textColor="@color/blue"
-        android:layout_marginVertical="20dp"/>
+        android:textSize="15dp" />
 
 
-
-
-
-    
 </LinearLayout>
