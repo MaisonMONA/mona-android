@@ -16,6 +16,13 @@
 
     </org.osmdroid.views.MapView>
 
+    <ImageButton
+        android:id="@+id/button_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:background="@mipmap/ic_map_person" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -113,12 +120,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6">
-
-        <ImageButton
-            android:id="@+id/button_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@mipmap/ic_map_person" />
 
         <EditText
             android:id="@+id/credit"
