@@ -45,13 +45,24 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="foregroundClipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="foregroundImage">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="scalingPercent" value="73" />
+                                                <entry key="scalingPercent" value="77" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -72,10 +83,10 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundLayerName" value="ic_launcher_background" />
-                                      <entry key="foregroundImage" value="C:\Users\Jacques\Desktop\DossierDeveloppeurs_Avril2019\Logo et thumbnail developpeurs\thumbnail 1024px.png" />
-                                      <entry key="foregroundLayerName" value="ic_logo_mona" />
-                                      <entry key="outputName" value="ic_mona1" />
+                                      <entry key="foregroundImage" value="C:\Users\Jacques\Desktop\android-matija\mona-android\app\src\main\res\drawable-xxhdpi\camera.png" />
+                                      <entry key="generateRoundIcon" value="false" />
+                                      <entry key="generateWebIcon" value="false" />
+                                      <entry key="outputName" value="ic_camera" />
                                     </map>
                                   </option>
                                 </PersistentState>

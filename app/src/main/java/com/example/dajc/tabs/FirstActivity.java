@@ -346,10 +346,13 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                         }
 
                         //category
-                        JSONObject category_object = c.getJSONObject("category");
-                        String category_fr = category_object.getString("fr");
-                        String category_en = category_object.getString("en");
-
+                        String category_fr = "NA";
+                        String category_en = "NA";
+                        if(!c.isNull("category")){
+                            JSONObject category_object = c.getJSONObject("category");
+                            category_fr = category_object.getString("fr");
+                            category_en = category_object.getString("en");
+                        }
 
                         //subcategory
                         String subcategory_fr = "NA";
@@ -360,7 +363,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                             subcategory_en = subcategory_object.getString("en");
                         }
 
-
+                        /*
                         //dimension
                         String dimensions = c.getString("dimensions");
                         if (!dimensions.equals("[]")){
@@ -375,12 +378,13 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                         } else {
                             dimensions = "NA";
                         }
-
+                        Pendant que le serveur se regle*/
+                        String dimensions = null;
 
 
                         //materials
                         String materials  = c.getString("materials");
-                        if (!materials.equals("null")){
+                        if (!materials.equals("[]")){
                             JSONArray materials_array  = c.getJSONArray("materials");
                             materials = treatTechnique(materials_array);
                         } else{
@@ -414,11 +418,16 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
                         //On va uniquement chercher le premier artiste
                         JSONArray artists_array = c.getJSONArray("artists");
-                        JSONObject temp_artist_info = (JSONObject) artists_array.get(0);
-                        String artist_id = temp_artist_info.getString("id");
-                        String artist_name = temp_artist_info.getString("name");
-                        Boolean artist_collective = Boolean.parseBoolean(temp_artist_info.getString("collective"));
+                        String artist_name = null;
+                        Boolean artist_collective = null;
+                        String artist_id = null;
 
+                        if(artists_array.length() > 0) {
+                            JSONObject temp_artist_info = (JSONObject) artists_array.get(0);
+                            artist_id = temp_artist_info.getString("id");
+                            artist_name = temp_artist_info.getString("name");
+                            artist_collective = Boolean.parseBoolean(temp_artist_info.getString("collective"));
+                        }
 
                         //Oeuvre uniquement en francais
                         OeuvreObject oeuvre = new OeuvreObject(title, id, category_fr, subcategory_fr, artist_name, produced_at, materials, lat, lng, 0, "", "", -1, borough, dimensions, techniques);

@@ -18,11 +18,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-
         </TextView>
 
 
     </androidx.appcompat.widget.Toolbar>
+
+    <com.example.dajc.tabs.NonSwipeableViewPager
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/pager">
+    </com.example.dajc.tabs.NonSwipeableViewPager>
 
 
     <com.google.android.material.tabs.TabLayout
@@ -34,6 +40,7 @@
         android:minHeight="?attr/actionBarSize"
         app:tabIndicatorColor="@color/Yellow"
         app:tabIndicatorHeight="5dp"
+        app:tabIndicatorGravity="top"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/black"
         app:tabTextAppearance="@android:style/TextAppearance.Widget.TabWidget"
@@ -41,12 +48,6 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-
-    <com.example.dajc.tabs.NonSwipeableViewPager
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/pager">
-    </com.example.dajc.tabs.NonSwipeableViewPager>
 
 
 </LinearLayout>

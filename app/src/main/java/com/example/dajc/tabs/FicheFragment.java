@@ -53,8 +53,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
+import static com.example.dajc.tabs.FirstActivity.db;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -67,7 +69,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
     OeuvreObject object;
     int numOeuvre;
     int etat_o;
-    ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
+    List<OeuvreObject> oeuvreList= new ArrayList<>();
     TextView title;
     TextView author;
     TextView date;
@@ -121,13 +123,12 @@ FicheFragment extends Fragment implements View.OnClickListener {
         //int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
         //numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
         oeuvreList = FirstActivity.getOeuvreList();
+
+
         View v;
 
         if(false || oeuvreList.get(idDuJour).getURI().equals("")){
             v = inflater.inflate(R.layout.fiche_noimg2_test, container, false);
-            fav_b = (ImageButton) v.findViewById(R.id.button_fav);
-            fav_b.setOnClickListener(this);
-
 
         }
         else{
@@ -177,16 +178,16 @@ FicheFragment extends Fragment implements View.OnClickListener {
 
             });
         }
-        map = (MapView) v.findViewById(R.id.map);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        //map = (MapView) v.findViewById(R.id.map);
+        //map.setTileSource(TileSourceFactory.MAPNIK);
 
         //set default zoom buttons and ability to zoom with fingers
-        map.setBuiltInZoomControls(false);
-        map.setMultiTouchControls(true);
+        //map.setBuiltInZoomControls(false);
+        //map.setMultiTouchControls(true);
 
         //set map default view point
-        mapController = map.getController();
-        mapController.setZoom(15);
+        //mapController = map.getController();
+        //mapController.setZoom(15);
         title = (TextView) v.findViewById(R.id.titre);
         author = (TextView) v.findViewById(R.id.artiste);
         date = (TextView) v.findViewById(R.id.date);
@@ -221,10 +222,10 @@ FicheFragment extends Fragment implements View.OnClickListener {
         //si l'oeuvre est dans les favoris, le bouton n'est "pas actif" donc blanc
         //etat_o egal 1 sur favori, 2 si dans la gallerie
         if (etat_o == 1) {
-            fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
+            //fav_b.setBackgroundResource(R.mipmap.ic_favorite_active);
         }
         else if (etat_o==0){
-            fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
+            //fav_b.setBackgroundResource(R.mipmap.ic_favorite_passive);
         }
         //si l'oeuvre est dans la galerie, on ne peut pas prendre de photo ou l'ajouter aux favoris
         //par contre, on affiche la date à laquelle la photo a été prise
@@ -313,9 +314,9 @@ FicheFragment extends Fragment implements View.OnClickListener {
             };
             ItemizedOverlayWithFocus<OverlayItem> mOverlay = new ItemizedOverlayWithFocus<OverlayItem>(items, iOverlay, getContext());
             mOverlay.setFocusItemsOnTap(true);
-            map.getOverlays().add(mOverlay);
+            //map.getOverlays().add(mOverlay);
             startPoint = new GeoPoint(art_lati, art_longi);
-            mapController.setCenter(startPoint);
+            //mapController.setCenter(startPoint);
         }
 
 

@@ -221,10 +221,6 @@ public class OeuvreObject implements Parcelable {
 
     @Override
     public String toString() {
-        return "Oeuvre{" +
-                "Titre='" + Titre + '\'' +
-                ", Materiaux='" + Materiaux + '\'' +
-                ", LocationX='" + LocationX + '\'' +
-                '}';
+        return Titre;
     }
 }
