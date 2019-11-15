@@ -123,8 +123,8 @@ FicheFragment extends Fragment implements View.OnClickListener {
         Calendar calendar = Calendar.getInstance();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         Random rand = new Random(dayOfYear);
-        //int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
-        //numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
+        int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
+        numOeuvre = Integer.parseInt(FirstActivity.oeuvreList.get(idDuJour).getId());
         oeuvreList = FirstActivity.getOeuvreList();
 
 

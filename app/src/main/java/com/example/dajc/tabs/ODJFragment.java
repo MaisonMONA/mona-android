@@ -24,15 +24,19 @@ public class ODJFragment extends Fragment {
     ImageButton map_b;
     ImageButton cam_b;
 
+    int numOeuvre;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
         View v;
         v = inflater.inflate(R.layout.fiche_noimg2_test, container, false);
 
+        oeuvreList = FirstActivity.getOeuvreList();
+
         Calendar calendar = Calendar.getInstance();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         Random rand = new Random(dayOfYear);
-        oeuvreList = FirstActivity.getOeuvreList();
+        int idDuJour = rand.nextInt(FirstActivity.oeuvreList.size());
 
 
         title = (TextView) v.findViewById(R.id.titre);
@@ -41,6 +45,25 @@ public class ODJFragment extends Fragment {
         infos = (TextView) v.findViewById(R.id.info);
         map_b = (ImageButton) v.findViewById(R.id.button_map);
         cam_b = (ImageButton) v.findViewById(R.id.button_cam);
+
+        //On set l'oeuvre du jour
+        title.setText(oeuvreList.get(idDuJour).getTitre());
+        author.setText(oeuvreList.get(idDuJour).getArtiste());
+        date.setText(oeuvreList.get(idDuJour).getDatedeCreation());
+        infos.setText(oeuvreList.get(idDuJour).getMateriaux());
+
+        cam_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                //TODO: ouvrir camera si lusager est assez proche
+            }
+        });
+        map_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                //TODO: ouvrir la map avec l'emplacement de l'oeuvre
+            }
+        });
 
         return v;
     }
