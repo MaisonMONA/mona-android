@@ -19,4 +19,11 @@
     </string>
     <string name="log_moi">LOG MOI</string>
     <string name="creer_un_compte">CREER UN COMPTE</string>
+
+    <!-- TODO: Organize strings by category -->
+
+    <string name="oeuvre_du_jour">Œuvre du jour</string>
+    <string name="carte">Carte</string>
+    <string name="oeuvres">Œuvres</string>
+    <string name="collection">Collection</string>
 </resources>

@@ -36,6 +36,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.example.dajc.tabs.Task.Oeuvre;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
@@ -54,6 +55,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import androidx.appcompat.widget.*;
 import androidx.viewpager.widget.ViewPager;
@@ -97,50 +99,62 @@ public class MainActivity extends AppCompatActivity{
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        oeuvreDuJour=true;
-        caller="";
-        lati=45.508567;;
-        longi=-73.566455;
-        triType=0;
+        oeuvreDuJour = true;
+        caller = "";
+        lati = 45.508567;
+        longi = -73.566455;
+        triType = 0;
         Permission = new Permissions(this);
-        if (Permission.checkPermAll()==false)
-        {
+        if (Permission.checkPermAll() == false) {
             Permission.requestAll();
         }
-        new getOeuvre().execute();
-       // new getBadge().execute();
+        try {
+            oeuvreList = new Oeuvre().get();
+            // new getBadge().execute();
 
-        //Setup of the tabs
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Œuvre du jour"));
-        tabLayout.addTab(tabLayout.newTab().setText("Carte"));
-        tabLayout.addTab(tabLayout.newTab().setText("Œuvres"));
-        tabLayout.addTab(tabLayout.newTab().setText("Collection"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
-
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
-        viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) { viewPager.setCurrentItem(tab.getPosition()); }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) { }});
+            //Setup of the tabs
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.oeuvre_du_jour));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.carte));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.oeuvres));
+            tabLayout.addTab(tabLayout.newTab().setText(R.string.collection));
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
 
-        //Setup icons on each tab
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(ICONS[i]);
+            final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+            final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+            viewPager.setAdapter(adapter);
+            viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
+
+
+            //Setup icons on each tab
+            for (int i = 0; i < tabLayout.getTabCount(); i++) {
+                tabLayout.getTabAt(i).setIcon(ICONS[i]);
+            }
+
+            //Potentiellement rajouter ici des icones lorsque on a selectionner l'onglet. Voir: https://github.com/roughike/BottomBar#changing-icons-based-on-selection-state
+
+        }catch(InterruptedException e){
+            // TODO: Manage InterruptedException
+        }catch(ExecutionException e){
+            // TODO: Manage ExecutionException
         }
-
-        //Potentiellement rajouter ici des icones lorsque on a selectionner l'onglet. Voir: https://github.com/roughike/BottomBar#changing-icons-based-on-selection-state
     }
-
     //Array containing tab icons
     final int[] ICONS = new int[]{
             R.mipmap.ic_odj_tab,
@@ -223,6 +237,7 @@ public class MainActivity extends AppCompatActivity{
         overridePendingTransition(0, 0);
         startActivity(intent);
     }
+
     private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
 
 
