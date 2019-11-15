@@ -1,6 +1,5 @@
 package com.example.dajc.tabs;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuInflater;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.PopupMenu;
 
 import java.util.ArrayList;
@@ -21,7 +19,7 @@ public class ODJActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fiche_noimg2_test);
+        setContentView(R.layout.oeuvre_jour_fragment);
         oeuvreList = FirstActivity.getOeuvreList();
 
         mMenu_Button = findViewById(R.id.menu_button);

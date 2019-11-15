@@ -1,7 +1,5 @@
 package com.example.dajc.tabs;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -16,7 +14,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -26,7 +23,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -35,7 +31,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -58,7 +53,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.dajc.tabs.FirstActivity.db;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -131,7 +125,7 @@ FicheFragment extends Fragment implements View.OnClickListener {
         View v;
 
         if(false || oeuvreList.get(idDuJour).getURI().equals("")){
-            v = inflater.inflate(R.layout.fiche_noimg2_test, container, false);
+            v = inflater.inflate(R.layout.oeuvre_jour_fragment, container, false);
 
         }
         else{

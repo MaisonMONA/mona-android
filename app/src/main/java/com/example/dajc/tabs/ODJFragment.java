@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
@@ -29,7 +27,7 @@ public class ODJFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
         View v;
-        v = inflater.inflate(R.layout.fiche_noimg2_test, container, false);
+        v = inflater.inflate(R.layout.oeuvre_jour_fragment, container, false);
 
         oeuvreList = FirstActivity.getOeuvreList();
 
