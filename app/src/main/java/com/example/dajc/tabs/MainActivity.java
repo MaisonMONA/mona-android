@@ -168,6 +168,14 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_main, popup.getMenu());
+        popup.show();
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -188,7 +196,6 @@ public class MainActivity extends AppCompatActivity{
             intent.putExtra("List", oeuvreList);
             startActivity(intent);
         }
-
         return true;
     }
     @Override

@@ -61,7 +61,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".LoginActivity2" />
-        <activity android:name=".BadgePopFragment"></activity>
+        <activity android:name=".BadgePopFragment"/>
+        <activity android:name=".ODJActivity"/>
     </application>
 
 </manifest>

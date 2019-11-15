@@ -11,6 +11,8 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.PopupMenu;
 
 import com.squareup.picasso.Picasso;
 
@@ -207,6 +211,28 @@ public class FicheActivity extends Activity implements View.OnClickListener {
         });
 
 
+    }
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_main, popup.getMenu());
+        popup.show();
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.settings) {
+            Intent intent = new Intent(this, PreferencesActivity.class);
+            intent.putExtra("List", oeuvreList);
+            startActivity(intent);
+        }
+        else if(item.getItemId() == R.id.badges) {
+            Intent intent = new Intent(this, Badge_Activity.class);
+            intent.putExtra("List", oeuvreList);
+            startActivity(intent);
+        }
+        return true;
     }
 
     @Override
