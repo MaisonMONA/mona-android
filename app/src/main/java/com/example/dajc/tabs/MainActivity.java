@@ -165,23 +165,6 @@ public class MainActivity extends AppCompatActivity{
     };
 
 
-    //Never used. Check later if any relation with map
-    public static void MapFrag(int position)
-    {
-        pager.setCurrentItem(1);
-    }
-    public static void listFrag(int position)
-    {
-        numOeuvre =position;
-        System.out.println("numOeuvre" +position);
-        if (pager.getAdapter() != null)
-            pager.setAdapter(null);
-        pager.setAdapter(pagerAdapter);
-
-        pager.setCurrentItem(0);
-    }
-
-
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
         MenuInflater inflater = popup.getMenuInflater();
@@ -237,17 +220,6 @@ public class MainActivity extends AppCompatActivity{
         overridePendingTransition(0, 0);
         startActivity(intent);
     }
-
-    private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
-
-
-        @Override
-        protected ArrayList<OeuvreObject> doInBackground(Void... voids) {
-            oeuvreList =new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
-            return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
-        }
-    }
-
 
 
 }
