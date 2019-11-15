@@ -17,6 +17,7 @@
             android:layout_height="match_parent"
             android:textAlignment="center"
             android:layout_weight="3"
+            android:fontFamily="@font/gill_sans"
             android:text="Tri par:" />
 
         <Spinner
@@ -32,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Afficher seulement les favoris" />
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="fill_parent"
