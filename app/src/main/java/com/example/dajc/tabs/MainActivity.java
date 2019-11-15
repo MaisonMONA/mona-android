@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
             Permission.requestAll();
         }
         try {
-            oeuvreList = new Oeuvre().get();
+            oeuvreList = new Oeuvre().execute().get();
             // new getBadge().execute();
 
             //Setup of the tabs

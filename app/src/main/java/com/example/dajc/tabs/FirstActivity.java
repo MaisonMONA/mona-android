@@ -8,39 +8,23 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.room.Room;
-
-import com.example.dajc.tabs.WebAPI.Artiste;
-import com.example.dajc.tabs.WebAPI.RunAPI;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.Console;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
 
@@ -133,7 +117,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         }
         else if(oeuvreList.size()>0){
             System.out.println("nani1");
-            Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);}
 
     }
@@ -165,7 +149,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             }
             else{
                 System.out.println("nani2");
-                Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 intent.putExtra("OeuvreList", oeuvreList);
                 startActivity(intent);}
         }
@@ -273,7 +257,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 startActivity(intent);}
             else{
                 System.out.println("nani3");
-                Intent intent = new Intent(getApplicationContext(), LoginActivity2.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 intent.putExtra("OeuvreList", oeuvreList);
                 startActivity(intent);}
             /*String param = "?Authorization=" + "allo";
