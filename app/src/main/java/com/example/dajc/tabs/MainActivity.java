@@ -214,148 +214,8 @@ public class MainActivity extends AppCompatActivity{
         }
         return super.dispatchTouchEvent( event );
     }
-/*
-    public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener{
-        List<Drawable> icons = new ArrayList<Drawable>();
-        List<Drawable> iconsHilighted = new ArrayList<>();
 
-
-        public PagerAdapter(FragmentManager fm) {
-            super(fm);
-            pager.addOnPageChangeListener(this);
-
-            Drawable icon1 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_odj_final);
-            Drawable icon1Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_home_active);
-            Drawable icon2 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_final);
-            Drawable icon2Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_map_active);
-            Drawable icon3 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_listview);
-            Drawable icon3Hilighted = getApplicationContext().getResources().getDrawable(R.mipmap.ic_favorite_active);
-            Drawable icon4 = getApplicationContext().getResources().getDrawable(R.mipmap.ic_collection_final);
-            Drawable icon4Hilighted= getApplicationContext().getResources().getDrawable(R.mipmap.ic_gallery_active);
-
-            icons.add(icon1);
-            icons.add(icon2);
-            icons.add(icon3);
-            icons.add(icon4);
-
-            iconsHilighted.add(icon1Hilighted);
-            iconsHilighted.add(icon2Hilighted);
-            iconsHilighted.add(icon3Hilighted);
-            iconsHilighted.add(icon4Hilighted);
-        }
-
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment;
-            Bundle args = new Bundle();
-            if (position == 0) {
-                System.out.println("Called for it");
-                fragment = new FicheFragment();
-            } else if (position == 1){
-                fragment = new MapFragment();
-            } else if (position == 2){
-                fragment = new ListViewFragment();
-            }
-            else if(position == 3){
-                fragment = new GalleryFragment();
-            }
-
-            else if(position == 4){
-                fragment = new MapFragment();
-            }
-
-            else {
-                fragment = new FicheFragment();
-            }
-
-            args.putInt("id", position);
-            args.putParcelableArrayList("List",oeuvreList);
-            args.putInt("numOeuvre", numOeuvre);
-            fragment.setArguments(args);
-
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return nb;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            String titre;
-            Drawable drawable;
-            if (position == 0) {
-                titre = "ODJ";
-                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
-            } else if (position == 1) {
-                titre = "Carte";
-                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
-            } else if (position == 2) {
-                titre = "Liste";
-                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
-            } else if(position == 3){
-                titre = "Galerie";
-                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
-            } else {
-                titre = "Badge";
-                drawable =getApplicationContext().getResources().getDrawable(R.mipmap.ic_lhome_passive);
-            }
-            SpannableStringBuilder sb = new SpannableStringBuilder("   " + titre); // space added before text for convenience
-            try {
-                drawable.setBounds(5, 5, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-                ImageSpan span = new ImageSpan(drawable, DynamicDrawableSpan.ALIGN_BASELINE);
-                sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-            return titre;
-        }
-
-        /*public CharSequence getPageTitle(int position) {
-            return null;
-        }
-
-        public void setTabIcon() {
-            for(int i = 0; i < icons.size(); i++) {
-                if(i == 0) {
-                    //noinspection ConstantConditions
-                    //tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
-                }
-                else {
-                    //noinspection ConstantConditions
-                    tabLayout.getTabAt(i).setIcon(icons.get(i));
-                }
-            }
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            for (int i = 0; i < getCount(); i++) {
-                if(i == position) {
-                    //noinspection ConstantConditions
-                   // tabLayout.getTabAt(i).setIcon(iconsHilighted.get(i));
-                }
-                else {
-                    //noinspection ConstantConditions
-                  //  tabLayout.getTabAt(i).setIcon(icons.get(i));
-                }
-            }
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            notifyDataSetChanged();
-        }
-    }
-*/    public void reload() {
+    public void reload() {
         Intent intent = getIntent();
         overridePendingTransition(0, 0);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -363,38 +223,6 @@ public class MainActivity extends AppCompatActivity{
         overridePendingTransition(0, 0);
         startActivity(intent);
     }
-    /* MIT EN COMMENTAIRE LE 12 OCTOBRE 2019
-
-        UTILE ??
-
-    public class CustomViewPager extends android.support.v4.view.ViewPager{
-        private boolean enabled;
-
-        public CustomViewPager(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            this.enabled = true;
-        }
-
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            return enabled ? super.onTouchEvent(event) : false;
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(MotionEvent event) {
-            return enabled ? super.onInterceptTouchEvent(event) : false;
-        }
-
-        public void setPagingEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public boolean isPagingEnabled() {
-            return enabled;
-        }
-
-    }
-    */
     private class getOeuvre extends AsyncTask<Void, Void, ArrayList<OeuvreObject>> {
 
 
@@ -404,13 +232,7 @@ public class MainActivity extends AppCompatActivity{
             return new ArrayList<OeuvreObject>(FirstActivity.getDb().getOeuvreDao().getAllOeuvre());
         }
     }
-    /*private class getBadge extends AsyncTask<Void, Void, ArrayList<BadgeObject>> {
-        @Override
-        protected ArrayList<BadgeObject> doInBackground(Void... voids) {
-            badgeList =new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
-            return new ArrayList<BadgeObject>(FirstActivity.getDb().getBadgeDao().getAllBadges());
-        }
-    } */
+
 
 
 }
