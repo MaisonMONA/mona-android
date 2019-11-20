@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -107,16 +108,22 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
         locationButton = (ImageButton) v.findViewById(R.id.button_location);
         locationButton.setOnClickListener(this);
+
         imgcollectionbutton = (ImageButton) v.findViewById(R.id.imageCollectionButton);
         imgcollectionbutton.setOnClickListener(this);
+
         imgciblebutton = (ImageButton) v.findViewById(R.id.imageCibleeButton3);
         imgciblebutton.setOnClickListener(this);
+
         imgnonvisitebutton = (ImageButton) v.findViewById(R.id.imageNonVisiteeButton2);
         imgnonvisitebutton.setOnClickListener(this);
+
         collectionbutton = (Button) v.findViewById(R.id.collection_button);
         collectionbutton.setOnClickListener(this);
+
         ciblebutton = (Button) v.findViewById(R.id.cible_button);
         ciblebutton.setOnClickListener(this);
+
         nonvisitebutton = (Button) v.findViewById(R.id.non_visitebutton);
         nonvisitebutton.setOnClickListener(this);
 
@@ -130,11 +137,20 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
         //set map default view point
         mapController = map.getController();
-        mapController.setZoom(15);
+        //mapController.setZoom(15);
+        //set the start point to user last known location or to mtl
+        mtl_lati = 45.508567;
+        mtl_longi = -73.566455;
+        startPoint = new GeoPoint(mtl_lati, mtl_longi);
+        Log.d("map", "start set to default location");
+
+        mapController.setCenter(startPoint);
+        map.setMaxZoomLevel(21.0);
 
         LocationManager locationManager = (LocationManager)getActivity().getSystemService(getActivity().LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, true);
+
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -153,21 +169,8 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             }
             locationManager.requestLocationUpdates(bestProvider, 5000, 0, this);
         }
-        //set the start point to user last known location or to mtl
-        mtl_lati = 45.508567;
-        mtl_longi = -73.566455;
-
-           // startPoint = new GeoPoint(lati, longi);
-           // Log.d("map", "start set to phone location");
-
-            startPoint = new GeoPoint(mtl_lati, mtl_longi);
-            Log.d("map", "start set to default location");
-
-        mapController.setCenter(startPoint);
-        map.setMaxZoomLevel(21.0);
 
         return v;
-
     }
 
     // fonctions de localisation
@@ -194,9 +197,10 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         int item_nb = 0;
         OverlayItem myOverlayItem;
         //Icone sur la map
-        Drawable artMarker = getResources().getDrawable(R.drawable.ic_pinblue);
-        Drawable artMarker2 = getResources().getDrawable(R.drawable.ic_pingreen);
-        Drawable artMarker3 = getResources().getDrawable(R.drawable.ic_pingold);
+
+        Drawable artMarker = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pinblue);
+        Drawable artMarker2 = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pingreen);
+        Drawable artMarker3 = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pingold);
 
         //dbh = new DBHelper(Activity.this);
         for (int i = 0; i < oeuvreList.size() ; i++) {

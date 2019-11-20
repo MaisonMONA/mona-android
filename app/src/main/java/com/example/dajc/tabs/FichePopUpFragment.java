@@ -90,7 +90,7 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
     String titre_o;
     String tech_nbr;
     String cat_nbr;
-    String quart_nbr ;
+    String quart_nbr;
     String mat_nbr ;
     String dimension_o ;
     String uri_photo ;
@@ -191,30 +191,6 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
         close.setOnClickListener(this);
         cam_b.setOnClickListener(this);
         map_b.setOnClickListener(this);
-        /*MainActivity.onSwipeTouchListener=new OnSwipeTouchListener(getActivity()) {
-            public void onSwipeTop() {
-                Toast.makeText(getActivity(), "top", Toast.LENGTH_SHORT).show();
-            }
-            public void onSwipeRight() {
-                MainActivity.numOeuvre+=1;
-                ListViewFragment frag = (ListViewFragment) getTargetFragment();
-                if(frag != null){
-                    frag.refreshDialog();
-                }
-            }
-            public void onSwipeLeft() {
-                MainActivity.numOeuvre+=-1;
-                ListViewFragment frag = (ListViewFragment) getTargetFragment();
-                if(frag != null){
-                    frag.refreshDialog();
-                }
-            }
-            public void onSwipeBottom() {
-                Toast.makeText(getActivity(), "bottom", Toast.LENGTH_SHORT).show();
-            }
-
-        };
-        v.setOnTouchListener(new OnSwipeTouchListener(getActivity()));*/
         new getOeuvre().execute();
         return v;
     }
