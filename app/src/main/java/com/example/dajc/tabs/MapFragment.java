@@ -139,7 +139,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
         //set map default view point
         mapController = map.getController();
-        mapController.setZoom((17);
+        mapController.setZoom((17));
         //set the start point to user last known location or to mtl
         mtl_lati = 45.508567;
         mtl_longi = -73.566455;
