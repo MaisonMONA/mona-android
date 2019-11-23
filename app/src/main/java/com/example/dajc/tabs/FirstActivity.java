@@ -173,56 +173,55 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            HttpHandler sh = new HttpHandler();
-            // Making a request to url and getting response
-            //String url = "http://donnees.ville.montreal.qc.ca/dataset/2980db3a-9eb4-4c0e-b7c6-a6584cb769c9/resource/18705524-c8a6-49a0-bca7-92f493e6d329/download/oeuvresdonneesouvertes.json";
-            //String url ="www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/?request=loadJson";
-            //String jsonStr = sh.makeServiceCall(url);
-            StringBuilder result = new StringBuilder();
-            URL url = null;
-            try {
-                url = new URL("https://picasso.iro.umontreal.ca/~mona/api/artworks");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            HttpURLConnection conn = null;
-            try {
-                conn = (HttpURLConnection) url.openConnection();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                conn.setRequestMethod("GET");
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            }
-            BufferedReader rd = null;
-            try {
-                rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            //parsing deja fait
-            String line;
-            try {
-                while ((line = rd.readLine()) != null) {
-                    result.append(line);
+            //PAGE = 14 pour linstant
+            //TODO: args number of pages
+            for(int page = 1; page <= 15; page++){
+                StringBuilder result = new StringBuilder();
+                URL url = null;
+                try {
+                    url = new URL("https://picasso.iro.umontreal.ca/~mona/api/artworks?page="+page);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                rd.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String jsonStr = result.toString();
+                HttpURLConnection conn = null;
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    conn.setRequestMethod("GET");
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                }
+                BufferedReader rd = null;
+                try {
+                    rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            Log.e(TAG, "Response from url: " + jsonStr);
-            if (jsonStr != null) {
-                createList(jsonStr);
-                createBadges();
+                //parsing deja fait
+                String line;
+                try {
+                    while ((line = rd.readLine()) != null) {
+                        result.append(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    rd.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String jsonStr = result.toString();
+
+                Log.e(TAG, "Response from url: " + jsonStr);
+                if (jsonStr != null) {
+                    createList(jsonStr);
+                    createBadges();
 
 /*
                 try {
@@ -234,17 +233,21 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 } catch (Exception e) {
                     Log.e(TAG, "File Saving error: " + e.getMessage());
                 }*/
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+                } else {
+                    Log.e(TAG, "Couldn't get json from server.");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Couldn't get json from server. Check LogCat for possible errors!",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+
             }
+
 
             return null;
         }
@@ -305,6 +308,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 // Getting JSON Array node
                 JSONObject oeuvres_data = new JSONObject(jsonStr);
                 JSONArray oeuvres = oeuvres_data.getJSONArray("data");
+                System.out.println("OEUVRE = "+oeuvres.length());
 
                 // looping through All Contacts
                 for (int i = 0; i < oeuvres.length(); i++) {

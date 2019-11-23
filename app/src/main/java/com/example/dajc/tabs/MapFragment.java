@@ -31,8 +31,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import com.example.dajc.tabs.WebAPI.Oeuvre;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -137,7 +139,7 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
 
         //set map default view point
         mapController = map.getController();
-        //mapController.setZoom(15);
+        mapController.setZoom((17);
         //set the start point to user last known location or to mtl
         mtl_lati = 45.508567;
         mtl_longi = -73.566455;
@@ -210,20 +212,22 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             art_longi = oeuvreList.get(i).getLocationY();
             artist = oeuvreList.get(i).getArtiste();
 
-            if (oeuvreList.get(i).getEtat()==2&&collectionnee)
+            //ETAT 0: NON VISITEE
+            //ETAT 1: CIBLE
+            //ETAT 2: COLLECTIONNE
+
+            if (oeuvreList.get(i).getEtat()==2 && collectionnee)
             {
                 myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker3);
                 items.add(myOverlayItem);
             }
-            else if (oeuvreList.get(i).getEtat()==1&&ciblee) {
+            else if (oeuvreList.get(i).getEtat()==1 && ciblee) {
                 myOverlayItem = new OverlayItem(idItem, title, idItem, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker2);
                 items.add(myOverlayItem);
             }
             else if(nonvisitee){
-                //System.out.println(oeuvreList.get(i).getEtat());
-                //System.out.println("this is an ID "+ idItem);
                 myOverlayItem = new OverlayItem(idItem, title, artist, new GeoPoint(art_lati, art_longi));
                 myOverlayItem.setMarker(artMarker);
                 items.add(myOverlayItem);
@@ -239,33 +243,24 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             public boolean onItemSingleTapUp(int index, OverlayItem item) {
                 //show the state
                 Toast.makeText(getContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
-
                 return false;
             }
 
             @Override
             public boolean onItemLongPress(final int index, OverlayItem item) {
-                //shows the name of the artwork
-                //should work on getting the fiche_noimg
-                System.out.println("item no" + index +" "+  (item.getUid()));
-                /*MainActivity.oeuvreDuJour=false;
-                MainActivity.listFrag(Integer.parseInt(item.getUid()));*/
-                //new changeFrag().execute((index));
                 MainActivity.numOeuvre = Integer.parseInt(item.getUid());
-                if(oeuvreList.get(index).getEtat()==2){
-                    MainActivity.withImg=false;
-                }
-                else{
-                    MainActivity.withImg=false;
-                }
                 MainActivity.caller="Map";
+
+                //OeuvreObject oeuvre_selected = oeuvreList.get(MainActivity.numOeuvre);
+
+                //DialogFragment newFragment = FichePopUpFragment2.newInstance(1337, oeuvre_selected);
+                //newFragment.show(getActivity().getSupportFragmentManager(), "simple Dialog");
+
                 dialogFragment = new FichePopUpFragment ();
                 dialogFragment.setTargetFragment(MapFragment.this, 1337);
                 dialogFragment.show(getActivity().getSupportFragmentManager(),"simple dialog");
                 return false;
             }
-
-
         };
 
         //mResourceProxy = getContext();
@@ -302,13 +297,6 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
         }
     }
     public void refreshDialog(){
-        //en prevision du swipe
-        /*if(oeuvreList.get(MainActivity.numOeuvre).getEtat()==2){
-            MainActivity.withImg=true;
-        }
-        else{
-            MainActivity.withImg=false;
-        }*/
         dialogFragment = new FichePopUpFragment ();
         dialogFragment.setTargetFragment(MapFragment.this, 1337);
         dialogFragment.show(getActivity().getSupportFragmentManager(),"simple dialog");

@@ -1,6 +1,8 @@
 package com.example.dajc.tabs;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+
+import static com.example.dajc.tabs.FichePopUpFragment.REQUEST_IMAGE_PICTURE;
 
 public class ODJFragment extends Fragment {
     ArrayList<OeuvreObject> oeuvreList= new ArrayList<>();
@@ -53,7 +57,14 @@ public class ODJFragment extends Fragment {
         cam_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                //TODO: ouvrir camera si lusager est assez proche
+                if (!MainActivity.Permission.checkPermissionForExternalStorage()) {
+                    MainActivity.Permission.requestPermissionForExternalStorage();
+                }
+                else {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
+                }
+
             }
         });
         map_b.setOnClickListener(new View.OnClickListener() {

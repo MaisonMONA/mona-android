@@ -106,7 +106,6 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
     GeoPoint startPoint;
     MapView map;
     GeoPoint myLocation;
-    //ResourceProxy mResourceProxy;
     IMapController mapController;
     ItemizedIconOverlay<OverlayItem> overlayL;
     String username;
@@ -439,9 +438,10 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                 break;
 
             case R.id.button_cam:
-                float range = 75;//metres
+                float range = 100000000;//metres
                 if(inRange(MainActivity.lati,MainActivity.longi,object.getLocationX(),object.getLocationY(),range)){
-                if (!MainActivity.Permission.checkPermissionForCamera()) {
+                //avoir acces camera
+                    if (!MainActivity.Permission.checkPermissionForCamera()) {
                     MainActivity.Permission.requestPermissionForCamera();
                 }
                 else {
@@ -450,21 +450,6 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
                     }
                     else {
                         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        /*File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-
-                        if (!mediaStorageDir.exists()) {
-                            mediaStorageDir.mkdirs();
-                        }
-
-                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                                Locale.getDefault()).format(new Date());
-                        try {
-                            File mediaFile = File.createTempFile(
-                                    "IMG_" + timeStamp,
-                                    ".jpg",
-                                    mediaStorageDir
-                            );
-                            //takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mediaFile));*/
                         startActivityForResult(takePictureIntent, REQUEST_IMAGE_PICTURE);
                     }
                 }
@@ -756,16 +741,21 @@ public class FichePopUpFragment extends DialogFragment implements View.OnClickLi
         protected boolean comm() throws IOException {
             boolean success = false;
 
+            //Retrieve token wherever necessary
+            SharedPreferences preferences = getActivity().getSharedPreferences("MY_APP",Context.MODE_PRIVATE);
+            String retrievedToken  = preferences.getString("TOKEN",null);//second parameter default value.
+
             String charset = "UTF-8";
-            String requestURL = "http://www-etud.iro.umontreal.ca/~beaurevg/ift3150/server/";
+            String requestURL = "https://picasso.iro.umontreal.ca/~mona/api/user/artworks/";
             File filesDir = getContext().getFilesDir();
             File imageFile = new File(filesDir,uri_photo);
             MultipartUtility multipart = new MultipartUtility(requestURL, charset);
-            multipart.addFormField("username", username);
-            multipart.addFormField("password", password);
-            multipart.addFormField("IDOeuvre", ""+numOeuvre);
-            multipart.addFormField("request", "addPicture");
-            multipart.addFilePart("file",  file);
+            multipart.addFormField("api_token", retrievedToken);
+            multipart.addFormField("id", ""+numOeuvre);
+            multipart.addFormField("rating", "");
+            multipart.addFormField("comment","" );
+            //multipart.addFormField("request", "addPicture");
+            //multipart.addFilePart("file",  file);
             String response = multipart.finish(); // response from server.
 
 /*
