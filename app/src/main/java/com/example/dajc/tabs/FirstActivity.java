@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -18,15 +19,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
+import android.content.res.Resources;
+
 
 /**
  * Created by LenaMK on 17/06/2016.
@@ -36,7 +46,13 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
     public static ArrayList<OeuvreObject> getOeuvreList() {
         return oeuvreList;
     }
+    public static ArrayList<LieuCulturel> getPlacesList() {
+        return placeList;
+    }
+
     static ArrayList<OeuvreObject> oeuvreList = new ArrayList<OeuvreObject>();
+    static ArrayList<LieuCulturel> placeList = new ArrayList<LieuCulturel>();
+
     public static ArrayList<BadgeObject> getBadgeList() {
         return badgeList;
     }
@@ -54,6 +70,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_activity);
+
 /*
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -88,7 +105,18 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 new GetOeuvres().execute();
             }
             else{*/
-                new UpdateOeuvres().execute();
+
+
+            new UpdateOeuvres().execute();
+
+            try{
+                createPlaceList();
+            } catch (ExecutionException e){
+                e.printStackTrace();
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+
             //}
         }
         else{
@@ -103,7 +131,6 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
             }
             */
         }
-
 
 
     }
@@ -122,6 +149,43 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
 
     }
 
+    public void createPlaceList() throws InterruptedException, ExecutionException {
+        GetPlaces getPlaces = new GetPlaces();
+        getPlaces.execute();
+        String jsonString = getPlaces.get();
+        this.getApplicationContext();
+    }
+
+
+    public void LieuCulturelParser(String jsonString) throws JSONException{
+            ArrayList<LieuCulturel> arrLieuxCulturels = new  ArrayList<LieuCulturel>();
+            JSONObject object = new JSONObject(jsonString);
+            JSONArray data = object.getJSONArray("data");
+            for(int i=1; i<data.length();i++){
+                JSONArray element =  (JSONArray) data.get(i);
+
+                String arrondissement = (String) element.get(0);
+                String nomReseau = (String) element.get(1);
+                String nomLieuCulturel = (String) element.get(2);
+                String adresse = (String) element.get(3);
+                String codePostal = (String) element.get(4);
+                String Ville = (String) element.get(5);
+                String Province = (String) element.get(6);
+                String Telephone = (String) element.get(7);
+                String siteInternet = (String) element.get(8);
+                Double longitude = (Double) element.get(9);
+                Double latitude = (Double) element.get(10);
+                String description = (String) element.get(11);
+
+                LieuCulturel temp = new LieuCulturel(arrondissement,nomReseau,nomLieuCulturel,adresse,codePostal,
+                        Ville,Province,Telephone,siteInternet,longitude,latitude,description);
+                arrLieuxCulturels.add(temp);
+            }
+            placeList =  arrLieuxCulturels;
+    }
+
+
+
     private class GetOeuvres extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -134,7 +198,7 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
         protected Void doInBackground(Void... arg0) {
 
             createList(null);
-                createBadges();
+            createBadges();
 
 
 
@@ -308,7 +372,6 @@ public class FirstActivity extends Activity {//implements View.OnClickListener{
                 // Getting JSON Array node
                 JSONObject oeuvres_data = new JSONObject(jsonStr);
                 JSONArray oeuvres = oeuvres_data.getJSONArray("data");
-                System.out.println("OEUVRE = "+oeuvres.length());
 
                 // looping through All Contacts
                 for (int i = 0; i < oeuvres.length(); i++) {

@@ -235,6 +235,14 @@ public class MapFragment extends Fragment implements LocationListener, View.OnCl
             item_nb++;
         }
 
+        //TESTING POUR LIEU CULTUREL
+        double lat_temp = 45.5154553;
+        double lon_temp = -73.5623129;
+        myOverlayItem = new OverlayItem("0", "Ville-Marie", new GeoPoint(lat_temp, lon_temp));
+        Drawable star = ContextCompat.getDrawable(getActivity(), R.mipmap.ic_camera_foreground);
+        myOverlayItem.setMarker(star);
+        items.add(myOverlayItem);
+        item_nb++;
 
         //Log.d("map", "Items added = " + item_nb);
         ItemizedIconOverlay.OnItemGestureListener iOverlay = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {

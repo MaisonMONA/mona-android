@@ -62,7 +62,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="scalingPercent" value="77" />
+                                                <entry key="scalingPercent" value="44" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -83,9 +83,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="foregroundImage" value="C:\Users\Jacques\Desktop\android-matija\mona-android\app\src\main\res\drawable-xxhdpi\camera.png" />
-                                      <entry key="generateRoundIcon" value="false" />
-                                      <entry key="generateWebIcon" value="false" />
+                                      <entry key="foregroundImage" value="C:\Users\Jacques\Desktop\mona_star.png" />
                                       <entry key="outputName" value="ic_camera" />
                                     </map>
                                   </option>
